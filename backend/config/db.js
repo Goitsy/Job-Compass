@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-//Database connection
 export const connect = () => {
   mongoose.connection.on("connected", () => {
     console.log("Your Mongo DB is successfully connected");
