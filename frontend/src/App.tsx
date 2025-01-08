@@ -1,26 +1,15 @@
-import React from "react";
+import { Route, Routes } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
+import { ThemeContextProvider } from "./state/ThemeContext";
+import Navbar from "./components/NavBar";
+import HeroSection from "./components/HeroSection";
 
 const App = () => {
   return (
-    <Box
-      sx={{
-        textAlign: "center",
-        padding: "2rem",
-        backgroundColor: "#f5f5f5",
-        minHeight: "100vh",
-      }}
-    >
-      <Typography variant="h2" component="h1" gutterBottom>
-        Welcome to Job Compass!
-      </Typography>
-      <Typography variant="body1" gutterBottom>
-        Track your job applications with ease. 🚀
-      </Typography>
-      <Button variant="contained" color="primary" href="/register">
-        Get Started
-      </Button>
-    </Box>
+    <ThemeContextProvider>
+      <Navbar />
+      <HeroSection />
+    </ThemeContextProvider>
   );
 };
 
