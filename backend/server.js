@@ -21,9 +21,9 @@ app.use(cors());
 
 //api endpoints
 
-app.get("/", (req, res) => {
-  res.send("API Woriking");
-});
+// app.get("/", (req, res) => {
+//   res.send("API Woriking");
+// });
 
 // server point
 app.listen(PORT, () => {
