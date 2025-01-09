@@ -7,30 +7,36 @@ import {
   Drawer,
   IconButton,
 } from "@mui/material";
-import { WbSunny, Brightness4, Menu, Close } from "@mui/icons-material";
+import { WbSunny, Brightness4, Menu, Close } from "@mui/icons-material"; // Icons for light/dark mode and hamburger menu
 import { ThemeContext } from "../state/ThemeContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // To navigate between pages
 
 const Navbar = () => {
-  const { mode, toggleMode } = useContext(ThemeContext);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { mode, toggleMode } = useContext(ThemeContext); // Access theme context
+  const navigate = useNavigate(); // Navigation handler
+  const location = useLocation(); // Get the current location (route)
 
+  // State for mobile menu
   const [openMenu, setOpenMenu] = useState(false);
 
+  // Check if the user is logged in by looking for a token in localStorage
   const isLoggedIn = !!localStorage.getItem("token");
 
+  // Navigate to different pages
   const goToHome = () => navigate("/home");
   const goToAnalytics = () => navigate("/analytics");
   const goToSettings = () => navigate("/settings");
 
+  // Handle logout
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+    localStorage.removeItem("token"); // Remove the token from localStorage
+    navigate("/"); // Redirect to the landing page
   };
 
+  // Open/close the mobile menu
   const toggleMenu = () => setOpenMenu(!openMenu);
 
+  // Don't show menu items on landing or auth page
   const hideMenu = location.pathname === "/" || location.pathname === "/auth";
 
   return (
@@ -49,6 +55,7 @@ const Navbar = () => {
         alignItems: "center",
       }}
     >
+      {/* Logo and App Name */}
       <Typography
         variant="h6"
         sx={{ fontWeight: "bold", cursor: "pointer" }}
@@ -57,6 +64,7 @@ const Navbar = () => {
         Job Compass
       </Typography>
 
+      {/* Mobile Hamburger Menu */}
       <IconButton
         sx={{ display: { xs: "block", sm: "none" } }}
         onClick={toggleMenu}
@@ -64,6 +72,7 @@ const Navbar = () => {
         <Menu sx={{ color: "white" }} />
       </IconButton>
 
+      {/* Drawer for mobile menu */}
       <Drawer anchor="right" open={openMenu} onClose={toggleMenu}>
         <Box sx={{ width: 250, p: 2 }}>
           <IconButton onClick={toggleMenu}>
@@ -86,7 +95,9 @@ const Navbar = () => {
         </Box>
       </Drawer>
 
+      {/* Desktop Menu */}
       <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 2 }}>
+        {/* If on the Landing or Auth page, only show Sign In/Register */}
         {hideMenu ? (
           <Button sx={{ color: "white" }} onClick={() => navigate("/auth")}>
             Sign In / Register
@@ -115,7 +126,7 @@ const Navbar = () => {
             )}
           </>
         )}
-
+        {/* Light/Dark Mode Toggle */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           {mode === "light" && <WbSunny sx={{ color: "white" }} />}
           {mode === "dark" && <Brightness4 sx={{ color: "white" }} />}

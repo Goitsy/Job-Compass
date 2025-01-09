@@ -1,139 +1,186 @@
-import { Box, Typography, TextField, Button, Grid } from "@mui/material";
+import React, { useState } from "react";
+import axios from "axios";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
+  const [signInData, setSignInData] = useState({ email: "", password: "" });
+  const [registerData, setRegisterData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleSignInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSignInData({ ...signInData, [e.target.name]: e.target.value });
+  };
+
+  const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRegisterData({ ...registerData, [e.target.name]: e.target.value });
+  };
+
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:9889/api/auth/register",
+        registerData
+      );
+      alert("Registration successful! Please sign in.");
+      console.log("Register Success:", response.data);
+
+      setRegisterData({ name: "", email: "", password: "" });
+    } catch (error) {
+      console.error("Register Error:", error);
+      alert("Registration failed. Please try again.");
+    }
+  };
+
+  const handleSignInSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        "http://localhost:9889/api/auth/login",
+        signInData
+      );
+      console.log("Login response:", response.data);
+      const { token, name } = response.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("userName", name);
+
+      console.log("Sign In Success:", response.data);
+
+      // Clear the sign-in form
+      setSignInData({ email: "", password: "" });
+      navigate("/home"); //HERE(WE ARE USING useNavigate() to help us access protected home route)
+    } catch (error) {
+      console.error("Sign In Error:", error);
+      alert("Sign-in failed. Check your credentials and try again.");
+    }
+  };
+
   return (
-    <Grid
-      container
-      sx={{
-        minHeight: "100vh",
-        backgroundColor: "#6C63FF", // Основно лилаво за фона
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 2,
-      }}
-    >
+    <Box sx={{ p: 4, textAlign: "center", fontFamily: "Arial, sans-serif" }}>
       <Box
         sx={{
-          width: "90%",
-          maxWidth: "800px",
-          backgroundColor: "#ffffff", // Бяло за фона на формите
-          borderRadius: "12px",
           display: "flex",
-          overflow: "hidden",
-          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)", // Лека сянка
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "center",
+          mt: 4,
+          ml: 20,
         }}
       >
-        {/* Лява страна */}
-        <Box
-          sx={{
-            flex: 1,
-            padding: 4,
-            backgroundColor: "#6C63FF", // Лилаво за лявата секция
-            color: "#ffffff", // Бял текст
-          }}
-        >
-          <Typography variant="h4" gutterBottom>
-            Welcome Back
+        <Paper elevation={3} sx={{ p: 3, flex: "1 1 300px" }}>
+          <Typography variant="h5" gutterBottom>
+            Sign In
           </Typography>
-          <Typography variant="body1" gutterBottom>
-            Track your job search journey
-          </Typography>
-          <form>
+          <form onSubmit={handleSignInSubmit}>
             <TextField
-              label="Email"
-              type="email"
               fullWidth
+              label="Email"
+              name="email"
+              value={signInData.email}
+              onChange={handleSignInChange}
               margin="normal"
-              variant="outlined"
             />
             <TextField
-              label="Password"
-              type="password"
               fullWidth
+              label="Password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              value={signInData.password}
+              onChange={handleSignInChange}
               margin="normal"
-              variant="outlined"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showPassword}
+                  onChange={() => setShowPassword(!showPassword)}
+                  color="primary"
+                />
+              }
+              label="Show Password"
             />
             <Button
-              variant="contained"
               fullWidth
-              sx={{
-                marginTop: "1rem",
-                backgroundColor: "#FF5722", // Оранжев бутон
-                color: "#ffffff",
-              }}
+              type="submit"
+              variant="contained"
+              color="primary"
+              sx={{ mt: 2 }}
             >
               Sign In
             </Button>
           </form>
-        </Box>
+        </Paper>
 
-        {/* Дясна страна */}
-        <Box
-          sx={{
-            flex: 1,
-            padding: 4,
-            backgroundColor: "#ffffff", // Бяло за дясната част
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <Typography variant="h4" gutterBottom>
-            New to Job Compass?
+        <Paper elevation={3} sx={{ p: 3, flex: "1 1 300px" }}>
+          <Typography variant="h5" gutterBottom>
+            Register
           </Typography>
-          <Typography variant="body1" gutterBottom>
-            Create an account and start your journey
-          </Typography>
-          <form>
+          <form onSubmit={handleRegisterSubmit}>
             <TextField
-              label="First Name"
               fullWidth
+              label="Name"
+              name="name"
+              value={registerData.name}
+              onChange={handleRegisterChange}
               margin="normal"
-              variant="outlined"
             />
             <TextField
-              label="Last Name"
               fullWidth
-              margin="normal"
-              variant="outlined"
-            />
-            <TextField
               label="Email"
-              type="email"
-              fullWidth
+              name="email"
+              value={registerData.email}
+              onChange={handleRegisterChange}
               margin="normal"
-              variant="outlined"
             />
             <TextField
+              fullWidth
               label="Password"
-              type="password"
-              fullWidth
+              name="password"
+              type={showPassword ? "text" : "password"}
+              value={registerData.password}
+              onChange={handleRegisterChange}
               margin="normal"
-              variant="outlined"
             />
-            <TextField
-              label="Confirm Password"
-              type="password"
-              fullWidth
-              margin="normal"
-              variant="outlined"
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showPassword}
+                  onChange={() => setShowPassword(!showPassword)}
+                  color="primary"
+                />
+              }
+              label="Show Password"
             />
             <Button
-              variant="contained"
               fullWidth
-              sx={{
-                marginTop: "1rem",
-                backgroundColor: "#6C63FF", // Лилав бутон
-                color: "#ffffff",
-              }}
+              type="submit"
+              variant="contained"
+              color="primary"
+              sx={{ mt: 2 }}
             >
-              Create Account
+              Register
             </Button>
           </form>
-        </Box>
+        </Paper>
       </Box>
-    </Grid>
+    </Box>
   );
 };
 
