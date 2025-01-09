@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { ThemeContextProvider } from "./state/ThemeContext";
+import Navbar from "./components/NavBar";
+import { Route, Routes } from "react-router-dom";
+import LandingPage from "./components/LandingPage";
+import RegisterPage from "./components/RegisterPage";
+import ProtectedRoute from "./routes/ProtectedRoutes";
+import HomePage from "./components/HomePage.tsx";
+import AnalyticsPage from "./components/AnalyticsPage";
+import SettingsPage from "./components/SettingsPage";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <ThemeContextProvider>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/auth" element={<RegisterPage />} />
+        <Route
+          path="home"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="analytics"
+          element={
+            <ProtectedRoute>
+              <AnalyticsPage />
+            </ProtectedRoute>
+          }
+        />
 
-export default App
+        <Route
+          path="settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </ThemeContextProvider>
+  );
+};
+
+export default App;
