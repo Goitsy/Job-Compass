@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connect } from "./config/db.js";
+import authRoutes from "./routes/auth.js";
 // import userModel from "./models/UserModel.js"
 
 // App Config
@@ -14,7 +15,7 @@ const PORT = process.env.PORT || 6000;
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5176",
+    origin: "http://localhost:5173",
   })
 );
 //api endpoints
