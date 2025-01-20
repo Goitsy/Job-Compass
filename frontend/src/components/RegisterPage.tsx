@@ -40,7 +40,7 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:6006/api/auth/register",
+        "http://localhost:9889/api/auth/register",
         registerData
       );
       alert("Registration successful! Please sign in.");
@@ -58,7 +58,7 @@ const RegisterPage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:6006/api/auth/login",
+        "http://localhost:9889/api/auth/login",
         signInData
       );
       console.log("Login response:", response.data);
