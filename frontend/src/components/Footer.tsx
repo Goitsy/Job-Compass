@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Typography, Stack, Link } from "@mui/material";
 import { Facebook, Twitter, Instagram } from "@mui/icons-material";
 
@@ -6,12 +5,12 @@ const Footer = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "black", // Black background
-        color: "white", // White text for contrast
-        padding: "40px 20px", // Padding for spacing
-        textAlign: "center", // Centered text
-        width: "100%", // Ensure it takes up the full width
-        position: "relative", // To avoid it being cut off
+        backgroundColor: "black",
+        color: "white",
+        padding: "40px 20px",
+        textAlign: "center",
+        width: "100vw",
+        position: "relative",
       }}
     >
       <Stack
@@ -19,12 +18,11 @@ const Footer = () => {
         spacing={4}
         justifyContent="space-between"
         sx={{
-          maxWidth: "1200px", // Maximum width for larger screens
-          margin: "0 auto", // Centers the content within the footer
+          maxWidth: "1200px",
+          margin: "0 auto",
           mb: 4,
         }}
       >
-        {/* Job Compass Section */}
         <Box sx={{ maxWidth: 300 }}>
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Job Compass
@@ -35,7 +33,6 @@ const Footer = () => {
           </Typography>
         </Box>
 
-        {/* Features Section */}
         <Box sx={{ maxWidth: 300 }}>
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Features
@@ -45,7 +42,6 @@ const Footer = () => {
           <Typography variant="body2">Analytics</Typography>
         </Box>
 
-        {/* Company Section */}
         <Box sx={{ maxWidth: 300 }}>
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Company
@@ -55,7 +51,6 @@ const Footer = () => {
           <Typography variant="body2">Privacy Policy</Typography>
         </Box>
 
-        {/* Connect Section */}
         <Box sx={{ maxWidth: 300 }}>
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Connect
