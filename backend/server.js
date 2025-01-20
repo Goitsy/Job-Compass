@@ -1,30 +1,32 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
+import cors from "cors";
 import { connect } from "./config/db.js";
 import authRoutes from "./routes/auth.js";
-// import userModel from "./models/UserModel.js"
+import jobAppRoutes from "./routes/jobAppRoutes.js";
 
-// App Config
 dotenv.config();
-connect();
-const app = express();
-const PORT = process.env.PORT || 6000;
 
-// middlewares
+const app = express();
+const PORT = process.env.PORT || 5000;
+connect();
+// Middleware
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5174",
   })
 );
-//api endpoints
-app.use("/api/auth", authRoutes);
-// app.get("/", (req, res) => {
-//   res.send("API Woriking");
-// });
 
-// server point
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/jobapp", jobAppRoutes);
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
+});
+
 app.listen(PORT, () => {
-  console.log(`SERVER IS RUNNING AND CONNECTED WITH DB: ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
