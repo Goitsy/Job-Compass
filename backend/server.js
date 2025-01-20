@@ -3,13 +3,12 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { connect } from "./config/db.js";
 import authRoutes from "./routes/auth.js"
-import authRoutes from "./routes/auth.js";
 import jobAppRoutes from "./routes/jobAppRoutes.js";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+
 connect();
 // Middleware
 
@@ -20,7 +19,7 @@ connect();
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5174",
+    origin: "http://localhost:5173",
   })
 );
 
