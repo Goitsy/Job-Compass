@@ -16,35 +16,37 @@ import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import { ThemeContext } from "../state/ThemeContext";
 
-const RegisterPage = () => {
+const SignInPage = () => {
   const { mode } = useContext(ThemeContext);
-  const [registerData, setRegisterData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+  const [signInData, setSignInData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRegisterData({ ...registerData, [e.target.name]: e.target.value });
+  const handleSignInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSignInData({ ...signInData, [e.target.name]: e.target.value });
   };
 
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
+  const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5005/api/auth/register",
-        registerData
+        "http://localhost:5005/api/auth/login",
+        signInData
       );
-      alert("Registration successful! Please sign in.");
-      console.log("Register Success:", response.data);
+      console.log("Login response:", response.data);
+      const { token, user } = response.data;
+      const { name } = user;
 
-      setRegisterData({ name: "", email: "", password: "" });
-      navigate("/auth/signin");
+      localStorage.setItem("token", token);
+      localStorage.setItem("userName", name);
+
+      console.log("Sign In Success:", response.data);
+
+      setSignInData({ email: "", password: "" });
+      navigate("/home");
     } catch (error) {
-      console.error("Register Error:", error);
-      alert("Registration failed. Please try again.");
+      console.error("Sign In Error:", error);
+      alert("Sign-in failed. Check your credentials and try again.");
     }
   };
 
@@ -74,23 +76,15 @@ const RegisterPage = () => {
         }}
       >
         <Typography variant="h5" gutterBottom>
-          Register
+          Sign In
         </Typography>
-        <form onSubmit={handleRegisterSubmit}>
-          <TextField
-            fullWidth
-            label="Name"
-            name="name"
-            value={registerData.name}
-            onChange={handleRegisterChange}
-            margin="normal"
-          />
+        <form onSubmit={handleSignInSubmit}>
           <TextField
             fullWidth
             label="Email"
             name="email"
-            value={registerData.email}
-            onChange={handleRegisterChange}
+            value={signInData.email}
+            onChange={handleSignInChange}
             margin="normal"
           />
           <TextField
@@ -98,8 +92,8 @@ const RegisterPage = () => {
             label="Password"
             name="password"
             type={showPassword ? "text" : "password"}
-            value={registerData.password}
-            onChange={handleRegisterChange}
+            value={signInData.password}
+            onChange={handleSignInChange}
             margin="normal"
           />
           <FormControlLabel
@@ -119,7 +113,7 @@ const RegisterPage = () => {
             color="primary"
             sx={{ mt: 2 }}
           >
-            Register
+            Sign In
           </Button>
 
           <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -140,12 +134,12 @@ const RegisterPage = () => {
           </Grid>
         </form>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          Already have an account?{" "}
-          <Button onClick={() => navigate("/auth/signin")}>Sign In</Button>
+          Not yet registered?{" "}
+          <Button onClick={() => navigate("/auth/register")}>Register</Button>
         </Typography>
       </Paper>
     </Box>
   );
 };
 
-export default RegisterPage;
+export default SignInPage;
