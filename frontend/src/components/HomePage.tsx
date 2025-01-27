@@ -69,7 +69,7 @@ const HomePage = () => {
 
   const fetchApplications = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/jobapp", {
+      const response = await axios.get("http://localhost:2000/api/jobapp", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setApplications(response.data);
@@ -139,7 +139,7 @@ const HomePage = () => {
     try {
       if (editId) {
         await axios.put(
-          `http://localhost:6006/api/jobapp/${editId}`,
+          `http://localhost:2000/api/jobapp/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -147,7 +147,7 @@ const HomePage = () => {
         );
         setEditId(null);
       } else {
-        await axios.post("http://localhost:6006/api/jobapp", formData, {
+        await axios.post("http://localhost:2000/api/jobapp", formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -161,7 +161,7 @@ const HomePage = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:6006/api/jobapp/${id}`, {
+      await axios.delete(`http://localhost:2000/api/jobapp/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchApplications();
@@ -184,7 +184,7 @@ const HomePage = () => {
     try {
       if (currentAppId) {
         await axios.put(
-          `http://localhost:6006/api/jobapp/update-status`,
+          `http://localhost:2000/api/jobapp/update-status`,
           { id: currentAppId, status },
           {
             headers: { Authorization: `Bearer ${token}` },
