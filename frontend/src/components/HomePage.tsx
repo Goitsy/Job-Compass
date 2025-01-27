@@ -15,11 +15,20 @@ import {
   Grid,
   Pagination,
   InputAdornment,
+  Chip,
 } from "@mui/material";
-import { Add, Close, MoreVert } from "@mui/icons-material";
+import {
+  Add,
+  Close,
+  MoreVert,
+  Business,
+  LocationOn,
+  Event,
+} from "@mui/icons-material";
 import { ThemeContext } from "../state/ThemeContext";
 import { SelectChangeEvent } from "@mui/material";
-import Footer from "./Footer";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface JobApplication {
   _id: string;
@@ -46,7 +55,6 @@ const HomePage = () => {
   const [editId, setEditId] = useState<string | null>(null);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [currentAppId, setCurrentAppId] = useState<string | null>(null);
-
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("dateOfApplication");
   const [sortOrder, setSortOrder] = useState<string>("desc");
@@ -69,7 +77,9 @@ const HomePage = () => {
 
   const fetchApplications = async () => {
     try {
-      const response = await axios.get("http://localhost:2000/api/jobapp", {
+
+      const response = await axios.get("http://localhost:5005/api/jobapp", {
+
         headers: { Authorization: `Bearer ${token}` },
       });
       setApplications(response.data);
@@ -88,6 +98,7 @@ const HomePage = () => {
           app.company.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
+
     filtered = filtered.sort((a, b) => {
       if (sortBy === "dateOfApplication") {
         const dateA = new Date(a.dateOfApplication).getTime();
@@ -130,8 +141,17 @@ const HomePage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, dateOfApplication: e.target.value });
+  const handleStatusChange = (e: SelectChangeEvent<string>) => {
+    setFormData({ ...formData, status: e.target.value });
+  };
+
+  const handleDateChange = (date: Date | null) => {
+    if (date) {
+      setFormData({
+        ...formData,
+        dateOfApplication: date.toISOString().split("T")[0],
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -139,7 +159,9 @@ const HomePage = () => {
     try {
       if (editId) {
         await axios.put(
-          `http://localhost:2000/api/jobapp/${editId}`,
+
+          `http://localhost:5005/api/jobapp/${editId}`,
+
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -147,7 +169,9 @@ const HomePage = () => {
         );
         setEditId(null);
       } else {
-        await axios.post("http://localhost:2000/api/jobapp", formData, {
+
+        await axios.post("http://localhost:5005/api/jobapp", formData, {
+
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -160,8 +184,9 @@ const HomePage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      await axios.delete(`http://localhost:2000/api/jobapp/${id}`, {
+
+      await axios.delete(`http://localhost:5005/api/jobapp/${id}`, {
+
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchApplications();
@@ -180,11 +205,13 @@ const HomePage = () => {
     setCurrentAppId(null);
   };
 
-  const handleStatusChange = async (status: string) => {
+  const handleStatusUpdate = async (status: string) => {
     try {
       if (currentAppId) {
         await axios.put(
-          `http://localhost:2000/api/jobapp/update-status`,
+
+          `http://localhost:5005/api/jobapp/update-status`,
+
           { id: currentAppId, status },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -194,7 +221,7 @@ const HomePage = () => {
         closeMenu();
       }
     } catch (error) {
-      console.error("Error changing status:", error);
+      console.error("Error updating status:", error);
     }
   };
 
@@ -209,17 +236,21 @@ const HomePage = () => {
       <Box
         sx={{
           p: 4,
-          width: "100vw",
+          minWidth: "100vw",
           minHeight: "100vh",
           background:
             mode === "light"
-              ? "linear-gradient(to bottom, #4c4f8c, #b87dd8)"
+              ? "linear-gradient(to bottom, #ffffff, #7C3AED,#ffffff)"
               : "linear-gradient(to bottom, #121212, #1f1f1f)",
           alignItems: "center",
           position: "relative",
         }}
       >
-        <Typography variant="h2" sx={{ mt: 8 }} color="#121212" gutterBottom>
+        <Typography
+          variant="h2"
+          sx={{ mt: 8, color: mode === "light" ? "#121212" : "#ffffff" }}
+          gutterBottom
+        >
           Welcome, {userName}
         </Typography>
 
@@ -298,20 +329,29 @@ const HomePage = () => {
                 onChange={handleChange}
                 margin="normal"
               />
-              <TextField
-                fullWidth
-                label="Date of Application"
-                name="dateOfApplication"
-                type="date"
-                value={formData.dateOfApplication || ""}
-                onChange={handleDateChange}
-                margin="normal"
-                InputProps={{
-                  inputProps: {
-                    shrink: true,
-                  },
-                }}
-              />
+              <Box sx={{ marginBottom: 2 }}>
+                <Typography>Date of Application</Typography>
+                <DatePicker
+                  selected={
+                    formData.dateOfApplication
+                      ? new Date(formData.dateOfApplication)
+                      : null
+                  }
+                  onChange={handleDateChange}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Select a date"
+                  showPopperArrow={false}
+                  customInput={
+                    <TextField
+                      sx={{ width: 350 }}
+                      fullWidth
+                      label="Select Date"
+                      value={formData.dateOfApplication || ""}
+                      onChange={handleChange}
+                    />
+                  }
+                />
+              </Box>
               <TextField
                 fullWidth
                 label="Company"
@@ -328,14 +368,20 @@ const HomePage = () => {
                 onChange={handleChange}
                 margin="normal"
               />
-              <TextField
-                fullWidth
-                label="Status"
-                name="status"
-                value={formData.status || ""}
-                onChange={handleChange}
-                margin="normal"
-              />
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={formData.status || ""}
+                  onChange={handleStatusChange}
+                  label="Status"
+                  name="status"
+                >
+                  <MenuItem value="Interview">Interview</MenuItem>
+                  <MenuItem value="Rejected">Rejected</MenuItem>
+                  <MenuItem value="In Review">In Review</MenuItem>
+                  <MenuItem value="Applied">Applied</MenuItem>
+                </Select>
+              </FormControl>
               <Button
                 type="submit"
                 variant="contained"
@@ -366,77 +412,124 @@ const HomePage = () => {
                 p: 3,
                 mb: 2,
                 display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                borderRadius: "16px",
-                borderLeft: `5px solid ${statusColors[app.status] || "gray"}`,
+                flexDirection: "column",
+                gap: 2,
+                borderRadius: "12px",
+                borderLeft: `6px solid ${statusColors[app.status] || "gray"}`,
                 width: "100%",
                 maxWidth: "600px",
                 margin: "10px 0",
                 boxShadow: 3,
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 6,
+                },
                 position: "relative",
               }}
             >
-              <Box>
-                <Typography variant="h6">{app.jobTitle}</Typography>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#7C3AED",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                }}
+              >
+                {app.jobTitle}
+              </Typography>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Business sx={{ fontSize: 18, color: "#7C3AED" }} />
+                <Typography sx={{ fontWeight: "bold" }}>Company:</Typography>
                 <Typography>{app.company}</Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <LocationOn sx={{ fontSize: 18, color: "#7C3AED" }} />
+                <Typography sx={{ fontWeight: "bold" }}>Location:</Typography>
                 <Typography>{app.location}</Typography>
-                <Typography>{`Date Applied: ${new Date(
-                  app.dateOfApplication
-                ).toLocaleDateString()}`}</Typography>
-                <Typography>Status: {app.status}</Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Event sx={{ fontSize: 18, color: "#7C3AED" }} />
+                <Typography sx={{ fontWeight: "bold" }}>
+                  Date Applied:
+                </Typography>
+                <Typography>
+                  {new Date(app.dateOfApplication).toLocaleDateString()}
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography sx={{ fontWeight: "bold" }}>Status:</Typography>
+                <Chip
+                  label={app.status}
+                  sx={{
+                    backgroundColor: statusColors[app.status] || "gray",
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                }}
+              >
                 <Button
                   variant="outlined"
                   color="primary"
                   href={app.jobUrl}
                   target="_blank"
-                  sx={{ mt: 2, ml: 55 }}
+                  sx={{ mt: 1 }}
                 >
                   View Job
                 </Button>
               </Box>
-              <Box sx={{ mt: 2, position: "absolute", top: 10, right: 10 }}>
-                <IconButton onClick={(e) => openMenu(e, app._id)}>
-                  <MoreVert />
-                </IconButton>
-                <Menu
-                  anchorEl={menuAnchor}
-                  open={Boolean(menuAnchor) && currentAppId === app._id}
-                  onClose={closeMenu}
-                >
-                  <MenuItem onClick={() => handleEdit(app)}>Edit</MenuItem>
-                  <MenuItem onClick={() => handleDelete(app._id)}>
-                    Delete
-                  </MenuItem>
-                  <MenuItem onClick={() => handleStatusChange("Interview")}>
-                    Mark as Interview
-                  </MenuItem>
-                  <MenuItem onClick={() => handleStatusChange("Rejected")}>
-                    Mark as Rejected
-                  </MenuItem>
-                  <MenuItem onClick={() => handleStatusChange("In Review")}>
-                    Mark as In Review
-                  </MenuItem>
-                  <MenuItem onClick={() => handleStatusChange("Applied")}>
-                    Mark as Applied
-                  </MenuItem>
-                </Menu>
-              </Box>
+
+              <IconButton
+                onClick={(e) => openMenu(e, app._id)}
+                sx={{ position: "absolute", top: 10, right: 10 }}
+              >
+                <MoreVert />
+              </IconButton>
+              <Menu
+                anchorEl={menuAnchor}
+                open={currentAppId === app._id}
+                onClose={closeMenu}
+              >
+                <MenuItem onClick={() => handleEdit(app)}>Edit</MenuItem>
+                <MenuItem onClick={() => handleDelete(app._id)}>
+                  Delete
+                </MenuItem>
+                {["Interview", "Rejected", "In Review", "Applied"].map(
+                  (status) => (
+                    <MenuItem
+                      key={status}
+                      onClick={() => handleStatusUpdate(status)}
+                    >
+                      Mark as {status}
+                    </MenuItem>
+                  )
+                )}
+              </Menu>
             </Paper>
           ))}
         </Box>
 
         <Pagination
-          count={Math.ceil(filteredApplications.length / itemsPerPage)}
+          count={Math.ceil(applications.length / itemsPerPage)}
           page={page}
           onChange={handlePageChange}
           color="primary"
-          sx={{ mt: 4 }}
+          sx={{ mt: 5, display: "flex", justifyContent: "center" }}
         />
       </Box>
-
-      <Footer />
     </>
   );
 };
