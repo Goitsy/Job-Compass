@@ -34,7 +34,9 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
+
         "http://localhost:5005/api/auth/register",
+
         registerData
       );
       alert("Registration successful! Please sign in.");
@@ -47,6 +49,33 @@ const RegisterPage = () => {
       alert("Registration failed. Please try again.");
     }
   };
+
+
+  const handleSignInSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5005/api/auth/login",
+        signInData
+      );
+      console.log("Login response:", response.data);
+      const { token, user } = response.data;
+      const { name } = user;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("userName", name);
+
+      console.log("Sign In Success:", response.data);
+
+      setSignInData({ email: "", password: "" });
+      navigate("/home");
+    } catch (error) {
+      console.error("Sign In Error:", error);
+      alert("Sign-in failed. Check your credentials and try again.");
+    }
+  };
+
 
   return (
     <Box
