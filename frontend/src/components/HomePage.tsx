@@ -77,9 +77,7 @@ const HomePage = () => {
 
   const fetchApplications = async () => {
     try {
-
-      const response = await axios.get("http://localhost:5005/api/jobapp", {
-
+      const response = await axios.get("http://localhost:5000/api/jobapp", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setApplications(response.data);
@@ -159,9 +157,7 @@ const HomePage = () => {
     try {
       if (editId) {
         await axios.put(
-
-          `http://localhost:5005/api/jobapp/${editId}`,
-
+          `http://localhost:5000/api/jobapp/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -169,9 +165,7 @@ const HomePage = () => {
         );
         setEditId(null);
       } else {
-
-        await axios.post("http://localhost:5005/api/jobapp", formData, {
-
+        await axios.post("http://localhost:5000/api/jobapp", formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -184,9 +178,8 @@ const HomePage = () => {
   };
 
   const handleDelete = async (id: string) => {
-
-      await axios.delete(`http://localhost:5005/api/jobapp/${id}`, {
-
+    try {
+      await axios.delete(`http://localhost:5000/api/jobapp/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchApplications();
@@ -209,9 +202,7 @@ const HomePage = () => {
     try {
       if (currentAppId) {
         await axios.put(
-
-          `http://localhost:5005/api/jobapp/update-status`,
-
+          `http://localhost:5000/api/jobapp/update-status`,
           { id: currentAppId, status },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -428,6 +419,7 @@ const HomePage = () => {
                 position: "relative",
               }}
             >
+              {/* Job Title */}
               <Typography
                 variant="h4"
                 sx={{
@@ -440,18 +432,21 @@ const HomePage = () => {
                 {app.jobTitle}
               </Typography>
 
+              {/* Company */}
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Business sx={{ fontSize: 18, color: "#7C3AED" }} />
                 <Typography sx={{ fontWeight: "bold" }}>Company:</Typography>
                 <Typography>{app.company}</Typography>
               </Box>
 
+              {/* Location */}
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <LocationOn sx={{ fontSize: 18, color: "#7C3AED" }} />
                 <Typography sx={{ fontWeight: "bold" }}>Location:</Typography>
                 <Typography>{app.location}</Typography>
               </Box>
 
+              {/* Date Applied */}
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Event sx={{ fontSize: 18, color: "#7C3AED" }} />
                 <Typography sx={{ fontWeight: "bold" }}>
@@ -462,6 +457,7 @@ const HomePage = () => {
                 </Typography>
               </Box>
 
+              {/* Status */}
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Typography sx={{ fontWeight: "bold" }}>Status:</Typography>
                 <Chip
@@ -474,6 +470,7 @@ const HomePage = () => {
                 />
               </Box>
 
+              {/* View Job Button */}
               <Box
                 sx={{
                   display: "flex",
@@ -492,6 +489,7 @@ const HomePage = () => {
                 </Button>
               </Box>
 
+              {/* Menu Button */}
               <IconButton
                 onClick={(e) => openMenu(e, app._id)}
                 sx={{ position: "absolute", top: 10, right: 10 }}
