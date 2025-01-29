@@ -34,7 +34,7 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "http://localhost:2000/api/auth/register",
         registerData
       );
       alert("Registration successful! Please sign in.");

@@ -30,7 +30,7 @@ const SignInPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5005/api/auth/login",
+        "http://localhost:2000/api/auth/login",
         signInData
       );
       console.log("Login response:", response.data);

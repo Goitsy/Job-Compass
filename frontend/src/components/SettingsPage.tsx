@@ -61,8 +61,12 @@ const SettingsPage: React.FC = () => {
   const [emailNotification, setEmailNotification] = useState(
     settings?.emailNotification || false
   );
-  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
-  const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
+    null
+  );
+  const [profilePicturePreview, setProfilePicturePreview] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     fetchSettings();
@@ -117,7 +121,9 @@ const SettingsPage: React.FC = () => {
     }
   };
 
-  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePictureChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setProfilePictureFile(file);
@@ -132,47 +138,49 @@ const SettingsPage: React.FC = () => {
     }
 
     const formData = new FormData();
-    formData.append('profilePicture', profilePictureFile);
+    formData.append("profilePicture", profilePictureFile);
 
     try {
-      console.log('Uploading profile picture:', {
+      console.log("Uploading profile picture:", {
         fileName: profilePictureFile.name,
         fileSize: profilePictureFile.size,
-        fileType: profilePictureFile.type
+        fileType: profilePictureFile.type,
       });
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        'http://localhost:2000/api/settings/upload-profile-picture', 
-        formData, 
+        "http://localhost:2000/api/settings/upload-profile-picture",
+        formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      setSettings(prev => ({
+      setSettings((prev) => ({
         ...prev,
-        profilePicture: response.data.profilePictureUrl
+        profilePicture: response.data.profilePictureUrl,
       }));
       setSuccess("Profile picture uploaded successfully");
       setProfilePictureFile(null);
     } catch (error) {
       console.error("Full profile picture upload error:", {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        response: error.response ? {
-          status: error.response.status,
-          data: error.response.data
-        } : null
+        error: error instanceof Error ? error.message : "Unknown error",
+        response: error.response
+          ? {
+              status: error.response.status,
+              data: error.response.data,
+            }
+          : null,
       });
 
       setError(
-        error.response?.data?.message || 
-        (error instanceof Error 
-          ? error.message 
-          : "Failed to upload profile picture")
+        error.response?.data?.message ||
+          (error instanceof Error
+            ? error.message
+            : "Failed to upload profile picture")
       );
     }
   };
@@ -201,7 +209,19 @@ const SettingsPage: React.FC = () => {
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setProfileChanges((prev) => ({ ...prev, [name]: value }));
+    setProfileChanges((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Add validation for name change
+    if (name === "newName") {
+      setProfileChanges((prev) => ({
+        ...prev,
+        confirmNewName:
+          prev.confirmNewName === prev.newName ? value : prev.confirmNewName,
+      }));
+    }
 
     // Clear any existing errors when user starts typing
     if (error) {
@@ -220,66 +240,10 @@ const SettingsPage: React.FC = () => {
     setError("");
     setSuccess("");
 
-    // Validate password if being changed
-    if (passwords.newPassword || passwords.currentPassword) {
-      if (passwords.newPassword !== passwords.confirmPassword) {
-        setError("New passwords do not match");
-        return;
-      }
-      if (passwords.newPassword.length < 6) {
-        setError("Password must be at least 6 characters long");
-        return;
-      }
-    }
-
-    // Validate name if being changed
+    // Validate name change
     if (profileChanges.newName) {
-      if (profileChanges.currentName !== settings.name) {
-        setError("Current name is incorrect");
-        return;
-      }
       if (profileChanges.newName !== profileChanges.confirmNewName) {
         setError("New names do not match");
-        return;
-      }
-    }
-
-    // Validate email if being changed
-    if (profileChanges.newEmail) {
-      // Check if current email is provided
-      if (!profileChanges.currentEmail) {
-        setError("Please enter your current email");
-        return;
-      }
-
-      // Check if current email matches
-      if (
-        profileChanges.currentEmail.toLowerCase() !==
-        settings.email.toLowerCase()
-      ) {
-        setError(
-          "Current email is incorrect. Please enter your current email address correctly."
-        );
-        return;
-      }
-
-      // Validate new email format
-      if (!/\S+@\S+\.\S+/.test(profileChanges.newEmail)) {
-        setError("Please enter a valid new email address");
-        return;
-      }
-
-      // Check if new email matches confirmation
-      if (profileChanges.newEmail !== profileChanges.confirmNewEmail) {
-        setError("New email addresses do not match");
-        return;
-      }
-
-      // Check if new email is different from current
-      if (
-        profileChanges.newEmail.toLowerCase() === settings.email.toLowerCase()
-      ) {
-        setError("New email must be different from your current email");
         return;
       }
     }
@@ -291,252 +255,292 @@ const SettingsPage: React.FC = () => {
         return;
       }
 
+      const updateData: any = {};
+
+      // Only include fields that have been changed
+      if (
+        profileChanges.newName &&
+        profileChanges.newName === profileChanges.confirmNewName
+      ) {
+        updateData.name = profileChanges.newName;
+      }
+
+      if (
+        profileChanges.newEmail &&
+        profileChanges.newEmail === profileChanges.confirmNewEmail
+      ) {
+        updateData.email = profileChanges.newEmail;
+      }
+
+      // Add password change logic if needed
+      if (passwords.newPassword) {
+        if (passwords.newPassword !== passwords.confirmPassword) {
+          setError("New passwords do not match");
+          return;
+        }
+        updateData.currentPassword = passwords.currentPassword;
+        updateData.newPassword = passwords.newPassword;
+      }
+
+      // Add additional fields from existing settings
+      updateData.theme = settings.theme;
+      updateData.weeklyReminder = settings.weeklyReminder;
+      updateData.monthlyReminder = settings.monthlyReminder;
+      updateData.emailNotification = emailNotification;
+
+      console.log("Sending update request with data:", updateData);
+
       const response = await fetch(
         "http://localhost:2000/api/settings/update",
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            name: profileChanges.newName || settings.name,
-            email: profileChanges.newEmail || settings.email,
-            currentPassword: passwords.currentPassword,
-            newPassword: passwords.newPassword,
-            theme: settings.theme,
-            weeklyReminder: settings.weeklyReminder,
-            monthlyReminder: settings.monthlyReminder,
-            emailNotification: emailNotification,
-            sendChangeNotification: true,
-          }),
+          body: JSON.stringify(updateData),
         }
       );
 
+      // Log full response for debugging
+      console.log("Response status:", response.status);
+      console.log(
+        "Response headers:",
+        Object.fromEntries(response.headers.entries())
+      );
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update settings");
+        const errorText = await response.text();
+        console.error("Error response body:", errorText);
+        throw new Error(
+          `HTTP error! status: ${response.status}, message: ${errorText}`
+        );
       }
 
-      const data = await response.json();
-      setSuccess("Settings updated successfully");
+      const updatedData = await response.json();
+
+      console.log("Updated data received:", updatedData);
+
+      // Update local state with new data
+      setSettings((prev) => ({
+        ...prev,
+        ...(updatedData.name && { name: updatedData.name }),
+        ...(updatedData.email && { email: updatedData.email }),
+      }));
+
+      // Update localStorage with new name
+      if (updatedData.name) {
+        localStorage.setItem("userName", updatedData.name);
+      }
+
+      // Reset form state
+      setProfileChanges({
+        currentName: updatedData.name || profileChanges.currentName,
+        newName: "",
+        confirmNewName: "",
+        currentEmail: updatedData.email || profileChanges.currentEmail,
+        newEmail: "",
+        confirmNewEmail: "",
+      });
+
       setPasswords({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-      setProfileChanges({
-        currentName: "",
-        newName: "",
-        confirmNewName: "",
-        currentEmail: "",
-        newEmail: "",
-        confirmNewEmail: "",
-      });
-      // Refresh settings after update
-      fetchSettings();
+
+      setSuccess("Settings updated successfully");
     } catch (error) {
-      console.error("Error updating settings:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to update settings"
-      );
+      console.error("Full settings update error:", {
+        errorName: error.name,
+        errorMessage: error.message,
+        errorStack: error.stack,
+      });
+
+      // More specific error handling
+      if (error instanceof TypeError) {
+        setError("Network error. Please check your internet connection.");
+      } else if (error instanceof Error) {
+        setError(error.message || "Failed to update settings");
+      } else {
+        setError("An unexpected error occurred");
+      }
     }
   };
 
   return (
     <Box
       sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        width: "100vw",
+        height: "100vh",
+        overflow: "auto",
         position: "fixed",
         top: 0,
         left: 0,
-        right: 0,
-        bottom: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        bgcolor: "background.default",
-        padding: {
-          xs: "10px", // Minimal padding for very small screens
-          sm: "20px", // Slightly more padding for small screens
-          md: "40px", // More padding for medium screens
-          lg: "60px", // Maximum padding for large screens
-          xl: "80px", // Extra padding for extra large screens
-        },
-        overflow: "auto", // Allow scrolling if content exceeds viewport
+        p: 0,
+        m: 0,
         boxSizing: "border-box",
-        width: "100%",
-        height: "100%",
-        "& > *": {
-          maxWidth: "100%", // Ensure child elements fit
-          maxHeight: "100%", // Prevent overflow
-          width: "100%",
-          overflowY: "auto", // Allow individual component scrolling if needed
-        },
+        backgroundColor: "background.default",
       }}
     >
-      {loading ? (
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <CircularProgress />
-        </Box>
-      ) : (
-        <Paper
-          elevation={3}
+      <Paper
+        elevation={3}
+        sx={{
+          width: "90%",
+          maxWidth: 1200,
+          minHeight: "80vh",
+          maxHeight: "95vh",
+          overflowY: "auto",
+          p: {
+            xs: 2,
+            sm: 3,
+            md: 4,
+          },
+          borderRadius: 2,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          alignItems: "stretch",
+          scrollbarWidth: "thin",
+          "&::-webkit-scrollbar": {
+            width: "8px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "rgba(0,0,0,0.2)",
+            borderRadius: "4px",
+          },
+        }}
+      >
+        <Typography
+          variant="h4"
+          align="center"
+          gutterBottom
           sx={{
-            width: {
-              xs: "100%", // Full width on extra small screens
-              sm: "95%", // Slightly narrower on small screens
-              md: "90%", // Even narrower on medium screens
-              lg: "80%", // Wider on large screens
-              xl: "70%", // Narrowest on extra large screens
-            },
-            maxWidth: {
-              xs: "100%",
-              sm: "600px",
-              md: "800px",
-              lg: "1000px",
-              xl: "1200px",
-            },
-            height: "auto",
-            minHeight: {
-              xs: "300px", // Minimum height for very small screens
-              sm: "400px",
-              md: "500px",
-              lg: "600px",
-            },
-            display: "flex",
-            flexDirection: "column",
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-            border: "1px solid rgba(0,0,0,0.1)",
-            p: {
-              xs: 2, // Less padding on small screens
-              sm: 3,
-              md: 4,
-              lg: 5,
-            },
-            "& form": {
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr", // Single column on small screens
-                md: "1fr 1fr", // Two columns on medium and larger screens
-              },
-              gap: {
-                xs: 2,
-                sm: 3,
-                md: 4,
-              },
-              "& > *": {
-                width: "100%",
-                minHeight: "auto",
-              },
-            },
-            "& .MuiTextField-root": {
-              my: {
-                xs: 0.5,
-                sm: 1,
-              },
-              width: "100%",
-            },
-            "& .MuiTypography-h4": {
-              fontSize: {
-                xs: "1.3rem",
-                sm: "1.5rem",
-                md: "1.75rem",
-                lg: "2rem",
-              },
-              mb: 3,
-              textAlign: "center",
-            },
-            "& .MuiTypography-h6": {
-              fontSize: {
-                xs: "1rem",
-                sm: "1.1rem",
-                md: "1.25rem",
-                lg: "1.4rem",
-              },
-              mb: 2,
-              textAlign: "center",
-            },
-            "& .MuiDivider-root": {
-              my: {
-                xs: 1,
-                sm: 2,
-              },
-            },
-            "& .MuiFormControlLabel-root": {
-              my: {
-                xs: 0.5,
-                sm: 1,
-              },
-            },
-            "& .MuiButton-root": {
-              mt: {
-                xs: 1,
-                sm: 2,
-              },
-              width: {
-                xs: "100%", // Full width on small screens
-                sm: "auto", // Auto width on larger screens
-              },
-            },
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            backgroundColor: "background.paper",
+            pt: 2,
+            pb: 1,
           }}
         >
-          <Typography variant="h4">Settings</Typography>
+          Settings
+        </Typography>
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              {success}
-            </Alert>
-          )}
-
-          <Box 
-            display="flex" 
-            flexDirection="column" 
-            alignItems="center" 
-            mb={3}
+        {error && (
+          <Alert
+            severity="error"
+            sx={{ mb: 2, position: "sticky", top: "60px", zIndex: 10 }}
           >
-            <Avatar
-              src={profilePicturePreview || settings.profilePicture}
-              sx={{ width: 120, height: 120, mb: 2 }}
-            />
-            <input
-              accept="image/*"
-              style={{ display: 'none' }}
-              id="profile-picture-upload"
-              type="file"
-              ref={fileInputRef}
-              onChange={handleProfilePictureChange}
-            />
-            <label htmlFor="profile-picture-upload">
-              <Button 
-                variant="contained" 
-                component="span" 
-                startIcon={<PhotoCamera />}
-              >
-                Change Profile Picture
-              </Button>
-            </label>
-            {profilePictureFile && (
-              <Button 
-                variant="outlined" 
-                color="primary" 
-                sx={{ mt: 1 }}
-                onClick={uploadProfilePicture}
-              >
-                Upload Picture
-              </Button>
-            )}
-          </Box>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert
+            severity="success"
+            sx={{ mb: 2, position: "sticky", top: "60px", zIndex: 10 }}
+          >
+            {success}
+          </Alert>
+        )}
 
-          <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-            <Box>
-              <Typography variant="h6">Profile Information</Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: {
+                xs: "column",
+                md: "row",
+              },
+              justifyContent: "space-between",
+              gap: 2,
+              width: "100%",
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                p: 2,
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                Profile Picture
+              </Typography>
+              <Avatar
+                src={profilePicturePreview || settings.profilePicture}
+                sx={{
+                  width: 120,
+                  height: 120,
+                  mb: 2,
+                  mx: "auto",
+                }}
+              />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  id="profile-picture-upload"
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleProfilePictureChange}
+                />
+                <label htmlFor="profile-picture-upload">
+                  <Button
+                    variant="contained"
+                    component="span"
+                    startIcon={<PhotoCamera />}
+                  >
+                    Change Profile Picture
+                  </Button>
+                </label>
+                {profilePictureFile && (
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    sx={{ mt: 1 }}
+                    onClick={uploadProfilePicture}
+                  >
+                    Upload Picture
+                  </Button>
+                )}
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                flex: 1,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                p: 2,
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                Account Settings
+              </Typography>
               <TextField
                 fullWidth
                 label="Current Name"
@@ -545,6 +549,7 @@ const SettingsPage: React.FC = () => {
                 onChange={handleProfileChange}
                 disabled
                 helperText="Your current name"
+                sx={{ mb: 2 }}
               />
               <TextField
                 fullWidth
@@ -553,6 +558,7 @@ const SettingsPage: React.FC = () => {
                 value={profileChanges.newName}
                 onChange={handleProfileChange}
                 helperText="Enter your new name"
+                sx={{ mb: 2 }}
               />
               {profileChanges.newName && (
                 <TextField
@@ -571,14 +577,9 @@ const SettingsPage: React.FC = () => {
                       ? "New names do not match"
                       : "Confirm your new name"
                   }
+                  sx={{ mb: 2 }}
                 />
               )}
-            </Box>
-
-            <Divider />
-
-            <Box>
-              <Typography variant="h6">Email Settings</Typography>
               <TextField
                 fullWidth
                 required
@@ -587,18 +588,8 @@ const SettingsPage: React.FC = () => {
                 type="email"
                 value={profileChanges.currentEmail}
                 onChange={handleProfileChange}
-                error={
-                  profileChanges.currentEmail !== "" &&
-                  profileChanges.currentEmail.toLowerCase() !==
-                    settings.email.toLowerCase()
-                }
-                helperText={
-                  profileChanges.currentEmail !== "" &&
-                  profileChanges.currentEmail.toLowerCase() !==
-                    settings.email.toLowerCase()
-                    ? "This doesn't match your current email"
-                    : "Enter your current email address for verification"
-                }
+                helperText="Enter your current email address"
+                sx={{ mb: 2 }}
               />
               <TextField
                 fullWidth
@@ -608,73 +599,35 @@ const SettingsPage: React.FC = () => {
                 value={profileChanges.newEmail}
                 onChange={handleProfileChange}
                 helperText="Enter your new email address"
-              />
-              {profileChanges.newEmail && (
-                <TextField
-                  fullWidth
-                  label="Confirm New Email"
-                  name="confirmNewEmail"
-                  type="email"
-                  value={profileChanges.confirmNewEmail}
-                  onChange={handleProfileChange}
-                  error={
-                    profileChanges.confirmNewEmail !== "" &&
-                    profileChanges.newEmail !== profileChanges.confirmNewEmail
-                  }
-                  helperText={
-                    profileChanges.confirmNewEmail !== "" &&
-                    profileChanges.newEmail !== profileChanges.confirmNewEmail
-                      ? "New email addresses do not match"
-                      : "Confirm your new email address"
-                  }
-                />
-              )}
-            </Box>
-
-            <Divider />
-
-            <Box>
-              <Typography variant="h6">Password</Typography>
-              <TextField
-                fullWidth
-                label="Current Password"
-                name="currentPassword"
-                type="password"
-                value={passwords.currentPassword}
-                onChange={handlePasswordChange}
-              />
-              <TextField
-                fullWidth
-                label="New Password"
-                name="newPassword"
-                type="password"
-                value={passwords.newPassword}
-                onChange={handlePasswordChange}
-              />
-              <TextField
-                fullWidth
-                label="Confirm New Password"
-                name="confirmPassword"
-                type="password"
-                value={passwords.confirmPassword}
-                onChange={handlePasswordChange}
-                error={
-                  passwords.confirmPassword !== "" &&
-                  passwords.newPassword !== passwords.confirmPassword
-                }
-                helperText={
-                  passwords.confirmPassword !== "" &&
-                  passwords.newPassword !== passwords.confirmPassword
-                    ? "New passwords do not match"
-                    : ""
-                }
+                sx={{ mb: 2 }}
               />
             </Box>
+          </Box>
 
-            <Divider />
-
-            <Box>
-              <Typography variant="h6">Preferences</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: {
+                xs: "column",
+                md: "row",
+              },
+              justifyContent: "space-between",
+              gap: 2,
+              width: "100%",
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                p: 2,
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                Notification Preferences
+              </Typography>
               <FormControlLabel
                 control={
                   <Switch
@@ -715,19 +668,75 @@ const SettingsPage: React.FC = () => {
                 label="Email Notifications"
               />
             </Box>
-
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="large"
-              fullWidth
+            <Box
+              sx={{
+                flex: 1,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                p: 2,
+              }}
             >
-              Save Changes
-            </Button>
-          </form>
-        </Paper>
-      )}
+              <Typography variant="h6" gutterBottom>
+                Password Change
+              </Typography>
+              <TextField
+                fullWidth
+                label="Current Password"
+                name="currentPassword"
+                type="password"
+                value={passwords.currentPassword}
+                onChange={handlePasswordChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                fullWidth
+                label="New Password"
+                name="newPassword"
+                type="password"
+                value={passwords.newPassword}
+                onChange={handlePasswordChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                fullWidth
+                label="Confirm New Password"
+                name="confirmPassword"
+                type="password"
+                value={passwords.confirmPassword}
+                onChange={handlePasswordChange}
+                error={
+                  passwords.confirmPassword !== "" &&
+                  passwords.newPassword !== passwords.confirmPassword
+                }
+                helperText={
+                  passwords.confirmPassword !== "" &&
+                  passwords.newPassword !== passwords.confirmPassword
+                    ? "New passwords do not match"
+                    : ""
+                }
+              />
+            </Box>
+          </Box>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            size="large"
+            fullWidth
+            sx={{
+              mt: 3,
+              py: 1.5,
+              position: "sticky",
+              bottom: 0,
+              zIndex: 10,
+            }}
+          >
+            Save Changes
+          </Button>
+        </Box>
+      </Paper>
     </Box>
   );
 };

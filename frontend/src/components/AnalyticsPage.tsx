@@ -33,7 +33,7 @@ const AnalyticsPage = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5005/api/analytics")
+      .get("http://localhost:2000/api/analytics")
       .then((response) => {
         setAnalytics(response.data);
       })

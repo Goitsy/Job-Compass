@@ -166,7 +166,7 @@ router.post('/upload-profile-picture', protect, upload.single('profilePicture'),
 });
 
 // Update user settings
-router.put('/update', protect, async (req, res) => {
+router.patch('/update', protect, async (req, res) => {
   try {
     const userId = req.user._id;
     const {
@@ -178,12 +178,23 @@ router.put('/update', protect, async (req, res) => {
       weeklyReminder,
       monthlyReminder,
       emailNotification,
-      sendChangeNotification
+      sendChangeNotification = true
     } = req.body;
 
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Validate password change if attempting to change password
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ message: 'Current password is required to change password' });
+      }
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
     }
 
     // Prepare changes object for email notification
@@ -197,44 +208,57 @@ router.put('/update', protect, async (req, res) => {
     };
 
     // Update user settings
-    user.name = name || user.name;
-    user.email = email || user.email;
-    user.theme = theme || user.theme;
-    user.weeklyReminder = weeklyReminder;
-    user.monthlyReminder = monthlyReminder;
-    user.emailNotification = emailNotification;
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (theme) user.theme = theme;
+    if (weeklyReminder !== undefined) user.weeklyReminder = weeklyReminder;
+    if (monthlyReminder !== undefined) user.monthlyReminder = monthlyReminder;
+    if (emailNotification !== undefined) user.emailNotification = emailNotification;
 
-    // Password change logic
-    if (currentPassword && newPassword) {
-      const isMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ message: 'Current password is incorrect' });
-      }
+    // Handle password change
+    if (newPassword) {
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(newPassword, salt);
     }
 
-    // Save updated user
     await user.save();
 
-    // Send email notification if enabled and changes exist
-    if (user.emailNotification && sendChangeNotification) {
+    // Send change notification email if requested
+    if (sendChangeNotification) {
       await sendSettingsChangeEmail(user, changes);
     }
 
+    // Return updated user settings (excluding sensitive information)
     res.json({
       name: user.name,
       email: user.email,
       theme: user.theme,
       weeklyReminder: user.weeklyReminder,
       monthlyReminder: user.monthlyReminder,
-      emailNotification: user.emailNotification,
-      profilePicture: user.profilePicture || ''
+      emailNotification: user.emailNotification
     });
   } catch (error) {
-    console.error('Error updating settings:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Settings update error:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    
+    // More detailed error response
+    res.status(500).json({
+      message: 'Failed to update settings',
+      error: {
+        message: error.message,
+        name: error.name
+      }
+    });
   }
+});
+
+// Keep PUT route for backwards compatibility
+router.put('/update', protect, async (req, res) => {
+  // Reuse the PATCH route handler
+  return router.patch('/update')(req, res);
 });
 
 export default router;
