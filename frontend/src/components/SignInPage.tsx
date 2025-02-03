@@ -31,7 +31,7 @@ const SignInPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5005/api/auth/login",
+        "http://localhost:2000/api/auth/login",
         signInData
       );
       console.log("Login response:", response.data);
@@ -56,7 +56,7 @@ const SignInPage = () => {
     if (user && user.displayName && user.email) {
       try {
         const response = await axios.post(
-          "http://localhost:5005/api/auth/google-login",
+          "http://localhost:2000/api/auth/google-login",
           {
             name: user.displayName,
             email: user.email,
@@ -79,7 +79,7 @@ const SignInPage = () => {
     if (user && user.displayName && user.email) {
       try {
         const response = await axios.post(
-          "http://localhost:5005/api/auth/facebook-login",
+          "http://localhost:2000/api/auth/facebook-login",
           {
             name: user.displayName,
             email: user.email,

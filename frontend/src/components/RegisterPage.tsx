@@ -41,7 +41,7 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5005/api/auth/register",
+        "http://localhost:2000/api/auth/register",
         registerData
       );
       alert("Registration successful! Please sign in.");
@@ -60,7 +60,7 @@ const RegisterPage = () => {
     if (user && user.displayName && user.email) {
       try {
         const response = await axios.post(
-          "http://localhost:5005/api/auth/google-register",
+          "http://localhost:2000/api/auth/google-register",
           {
             name: user.displayName,
             email: user.email,
@@ -88,7 +88,7 @@ const RegisterPage = () => {
 
       if (user && user.displayName && user.email) {
         const response = await axios.post(
-          "http://localhost:5005/api/auth/facebook-register",
+          "http://localhost:2000/api/auth/facebook-register",
           {
             name: user.displayName,
             email: user.email,

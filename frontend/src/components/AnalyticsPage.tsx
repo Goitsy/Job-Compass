@@ -46,7 +46,7 @@ const AnalyticsPage = () => {
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://localhost:5005/api/analytics", {
+      .get("http://localhost:2000/api/analytics", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
