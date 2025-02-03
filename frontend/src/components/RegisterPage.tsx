@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -15,6 +15,13 @@ import {
 import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import { ThemeContext } from "../state/ThemeContext";
+import { signInWithGoogle } from "../firebaseConfig";
+import {
+  getAuth,
+  FacebookAuthProvider,
+  signInWithPopup,
+  UserCredential,
+} from "firebase/auth";
 
 const RegisterPage = () => {
   const { mode } = useContext(ThemeContext);
@@ -34,7 +41,7 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:2000/api/auth/register",
+        "http://localhost:5005/api/auth/register",
         registerData
       );
       alert("Registration successful! Please sign in.");
@@ -48,6 +55,55 @@ const RegisterPage = () => {
     }
   };
 
+  const handleGoogleRegister = async () => {
+    const user = await signInWithGoogle();
+    if (user && user.displayName && user.email) {
+      try {
+        const response = await axios.post(
+          "http://localhost:5005/api/auth/google-register",
+          {
+            name: user.displayName,
+            email: user.email,
+          }
+        );
+        const { token } = response.data;
+        localStorage.setItem("token", token);
+        localStorage.setItem("userName", user.displayName);
+
+        navigate("/auth/signin");
+      } catch (error) {
+        console.error("Google Register Backend Error:", error);
+      }
+    } else {
+      console.error("Google login failed: Missing user details.");
+    }
+  };
+  const handleFacebookRegister = async () => {
+    try {
+      const userCredential: UserCredential = await signInWithPopup(
+        getAuth(),
+        new FacebookAuthProvider()
+      );
+      const user = userCredential.user;
+
+      if (user && user.displayName && user.email) {
+        const response = await axios.post(
+          "http://localhost:5005/api/auth/facebook-register",
+          {
+            name: user.displayName,
+            email: user.email,
+          }
+        );
+        const { token } = response.data;
+        localStorage.setItem("token", token);
+        localStorage.setItem("userName", user.displayName);
+
+        navigate("/auth/signin");
+      }
+    } catch (error) {
+      console.error("Facebook Register Error:", error);
+    }
+  };
   return (
     <Box
       sx={{
@@ -123,16 +179,24 @@ const RegisterPage = () => {
           </Button>
 
           <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <Box sx={{ width: "100%" }}>
-                <IconButton color="error" sx={{ width: "100%" }}>
+                <IconButton
+                  color="error"
+                  sx={{ width: "100%" }}
+                  onClick={handleGoogleRegister}
+                >
                   <GoogleIcon />
                 </IconButton>
               </Box>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <Box sx={{ width: "100%" }}>
-                <IconButton color="primary" sx={{ width: "100%" }}>
+                <IconButton
+                  color="primary"
+                  sx={{ width: "100%" }}
+                  onClick={handleFacebookRegister}
+                >
                   <FacebookIcon />
                 </IconButton>
               </Box>

@@ -25,7 +25,10 @@ const Navbar = () => {
 
   const toggleMenu = () => setOpenMenu(!openMenu);
 
-  const hideMenu = location.pathname === "/" || location.pathname === "/auth";
+  const hideMenu =
+    location.pathname === "/" ||
+    location.pathname === "/auth/signin" ||
+    location.pathname === "/auth/register";
 
   return (
     <Box
@@ -72,7 +75,7 @@ const Navbar = () => {
                 <Button onClick={handleLogout}>Logout</Button>
               </>
             ) : (
-              <Button onClick={() => navigate("/auth")}>
+              <Button onClick={() => navigate("/auth/signin")}>
                 Sign In / Register
               </Button>
             )}
@@ -82,7 +85,10 @@ const Navbar = () => {
 
       <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 2 }}>
         {hideMenu ? (
-          <Button sx={{ color: "white" }} onClick={() => navigate("/auth")}>
+          <Button
+            sx={{ color: "white" }}
+            onClick={() => navigate("/auth/signin")}
+          >
             Sign In / Register
           </Button>
         ) : (
@@ -103,20 +109,27 @@ const Navbar = () => {
                 </Button>
               </>
             ) : (
-              <Button sx={{ color: "white" }} onClick={() => navigate("/auth")}>
+              <Button
+                sx={{ color: "white" }}
+                onClick={() => navigate("/auth/signin")}
+              >
                 Sign In / Register
               </Button>
             )}
           </>
         )}
-
-        <IconButton
-          onClick={toggleMode}
-          sx={{ color: "white", fontSize: "24px" }}
-        >
-          {mode === "light" ? <FaSun /> : <FaMoon />}
-        </IconButton>
       </Box>
+
+      <IconButton
+        onClick={toggleMode}
+        sx={{
+          color: "white",
+          fontSize: "24px",
+          display: { xs: "block", sm: "block" },
+        }}
+      >
+        {mode === "light" ? <FaSun /> : <FaMoon />}
+      </IconButton>
     </Box>
   );
 };

@@ -1,10 +1,12 @@
 import express from "express";
 import jobApplicationModel from "../models/jobApplicationModel.js";
+import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
-router.get("/analytics", async (req, res) => {
+
+router.get("/analytics", protect, async (req, res) => {
   try {
-    const applications = await jobApplicationModel.find({});
+    const applications = await jobApplicationModel.find({ user: req.user._id });
 
     const monthlyData = {};
     const yearlyData = {};

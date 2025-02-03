@@ -80,7 +80,7 @@ const SettingsPage: React.FC = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:2000/api/settings", {
+      const response = await fetch("http://localhost:5000/api/settings", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -149,7 +149,7 @@ const SettingsPage: React.FC = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:2000/api/settings/upload-profile-picture",
+        "http://localhost:5000/api/settings/upload-profile-picture",
         formData,
         {
           headers: {
@@ -291,7 +291,7 @@ const SettingsPage: React.FC = () => {
       console.log("Sending update request with data:", updateData);
 
       const response = await fetch(
-        "http://localhost:2000/api/settings/update",
+        "http://localhost:5000/api/settings/update",
         {
           method: "PATCH",
           headers: {
@@ -373,290 +373,105 @@ const SettingsPage: React.FC = () => {
       sx={{
         display: "flex",
         justifyContent: "center",
-        alignItems: "center",
         minHeight: "100vh",
-        width: "100vw",
-        height: "100vh",
-        overflow: "auto",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        p: 0,
-        m: 0,
-        boxSizing: "border-box",
-        backgroundColor: "background.default",
+        alignItems: "center",
+        backgroundColor: mode === "light" ? "white" : "gray",
       }}
     >
-      <Paper
-        elevation={3}
-        sx={{
-          width: "90%",
-          maxWidth: 1200,
-          minHeight: "80vh",
-          maxHeight: "95vh",
-          overflowY: "auto",
-          p: {
-            xs: 2,
-            sm: 3,
-            md: 4,
-          },
-          borderRadius: 2,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "stretch",
-          scrollbarWidth: "thin",
-          "&::-webkit-scrollbar": {
-            width: "8px",
-          },
-          "&::-webkit-scrollbar-track": {
-            background: "transparent",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "rgba(0,0,0,0.2)",
-            borderRadius: "4px",
-          },
-        }}
-      >
-        <Typography
-          variant="h4"
-          align="center"
-          gutterBottom
-          sx={{
-            position: "sticky",
-            top: 0,
-            zIndex: 10,
-            backgroundColor: "background.paper",
-            pt: 2,
-            pb: 1,
-          }}
-        >
-          Settings
-        </Typography>
+      <Container maxWidth="md">
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <Paper sx={{ p: 4 }} elevation={3}>
+            <Typography variant="h4" gutterBottom>
+              User Settings
+            </Typography>
 
-        {error && (
-          <Alert
-            severity="error"
-            sx={{ mb: 2, position: "sticky", top: "60px", zIndex: 10 }}
-          >
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert
-            severity="success"
-            sx={{ mb: 2, position: "sticky", top: "60px", zIndex: 10 }}
-          >
-            {success}
-          </Alert>
-        )}
+            {success && <Alert severity="success">{success}</Alert>}
+            {error && <Alert severity="error">{error}</Alert>}
 
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: {
-                xs: "column",
-                md: "row",
-              },
-              justifyContent: "space-between",
-              gap: 2,
-              width: "100%",
-            }}
-          >
-            <Box
-              sx={{
-                flex: 1,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-                p: 2,
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                Profile Picture
-              </Typography>
-              <Avatar
-                src={profilePicturePreview || settings.profilePicture}
-                sx={{
-                  width: 120,
-                  height: 120,
-                  mb: 2,
-                  mx: "auto",
-                }}
-              />
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
+            <form onSubmit={handleSubmit}>
+              <Typography variant="h6">Profile</Typography>
+
+              {/* Profile picture */}
+              <Box>
+                <Avatar
+                  alt="Profile Picture"
+                  src={profilePicturePreview || ""}
+                  sx={{ width: 100, height: 100 }}
+                />
                 <input
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  id="profile-picture-upload"
                   type="file"
                   ref={fileInputRef}
+                  accept="image/*"
                   onChange={handleProfilePictureChange}
+                  hidden
                 />
-                <label htmlFor="profile-picture-upload">
-                  <Button
-                    variant="contained"
-                    component="span"
-                    startIcon={<PhotoCamera />}
-                  >
-                    Change Profile Picture
-                  </Button>
-                </label>
-                {profilePictureFile && (
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    sx={{ mt: 1 }}
-                    onClick={uploadProfilePicture}
-                  >
-                    Upload Picture
-                  </Button>
-                )}
+                <IconButton
+                  color="primary"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <PhotoCamera />
+                </IconButton>
+                <Button
+                  variant="outlined"
+                  onClick={uploadProfilePicture}
+                  sx={{ ml: 2 }}
+                >
+                  Upload Profile Picture
+                </Button>
               </Box>
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-                p: 2,
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                Account Settings
-              </Typography>
+
+              {/* Name */}
               <TextField
                 fullWidth
-                label="Current Name"
-                name="currentName"
-                value={profileChanges.currentName}
-                onChange={handleProfileChange}
-                disabled
-                helperText="Your current name"
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                fullWidth
-                label="New Name"
-                name="newName"
+                label="Name"
+                name="name"
                 value={profileChanges.newName}
                 onChange={handleProfileChange}
-                helperText="Enter your new name"
-                sx={{ mb: 2 }}
+                sx={{ mt: 2 }}
               />
-              {profileChanges.newName && (
-                <TextField
-                  fullWidth
-                  label="Confirm New Name"
-                  name="confirmNewName"
-                  value={profileChanges.confirmNewName}
-                  onChange={handleProfileChange}
-                  error={
-                    profileChanges.confirmNewName !== "" &&
-                    profileChanges.newName !== profileChanges.confirmNewName
-                  }
-                  helperText={
-                    profileChanges.confirmNewName !== "" &&
-                    profileChanges.newName !== profileChanges.confirmNewName
-                      ? "New names do not match"
-                      : "Confirm your new name"
-                  }
-                  sx={{ mb: 2 }}
-                />
-              )}
+
+              {/* Email */}
               <TextField
                 fullWidth
-                required
-                label="Current Email"
-                name="currentEmail"
-                type="email"
-                value={profileChanges.currentEmail}
-                onChange={handleProfileChange}
-                helperText="Enter your current email address"
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                fullWidth
-                label="New Email"
-                name="newEmail"
-                type="email"
+                label="Email"
+                name="email"
                 value={profileChanges.newEmail}
                 onChange={handleProfileChange}
-                helperText="Enter your new email address"
-                sx={{ mb: 2 }}
+                sx={{ mt: 2 }}
               />
-            </Box>
-          </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: {
-                xs: "column",
-                md: "row",
-              },
-              justifyContent: "space-between",
-              gap: 2,
-              width: "100%",
-            }}
-          >
-            <Box
-              sx={{
-                flex: 1,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-                p: 2,
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                Notification Preferences
-              </Typography>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={settings.theme === "dark"}
-                    onChange={handleThemeChange}
-                  />
-                }
-                label="Dark Theme"
+              {/* Password */}
+              <TextField
+                fullWidth
+                label="Current Password"
+                name="currentPassword"
+                value={passwords.currentPassword}
+                onChange={handlePasswordChange}
+                type="password"
+                sx={{ mt: 2 }}
               />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={settings.weeklyReminder}
-                    onChange={handleInputChange}
-                    name="weeklyReminder"
-                  />
-                }
-                label="Weekly Reminders"
+              <TextField
+                fullWidth
+                label="New Password"
+                name="newPassword"
+                value={passwords.newPassword}
+                onChange={handlePasswordChange}
+                type="password"
+                sx={{ mt: 2 }}
               />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={settings.monthlyReminder}
-                    onChange={handleInputChange}
-                    name="monthlyReminder"
-                  />
-                }
-                label="Monthly Reminders"
+              <TextField
+                fullWidth
+                label="Confirm New Password"
+                name="confirmPassword"
+                value={passwords.confirmPassword}
+                onChange={handlePasswordChange}
+                type="password"
+                sx={{ mt: 2 }}
               />
+
+              {/* Email notifications */}
               <FormControlLabel
                 control={
                   <Switch
@@ -665,78 +480,21 @@ const SettingsPage: React.FC = () => {
                     name="emailNotification"
                   />
                 }
-                label="Email Notifications"
+                label="Email Notification"
               />
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-                p: 2,
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                Password Change
-              </Typography>
-              <TextField
-                fullWidth
-                label="Current Password"
-                name="currentPassword"
-                type="password"
-                value={passwords.currentPassword}
-                onChange={handlePasswordChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                fullWidth
-                label="New Password"
-                name="newPassword"
-                type="password"
-                value={passwords.newPassword}
-                onChange={handlePasswordChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                fullWidth
-                label="Confirm New Password"
-                name="confirmPassword"
-                type="password"
-                value={passwords.confirmPassword}
-                onChange={handlePasswordChange}
-                error={
-                  passwords.confirmPassword !== "" &&
-                  passwords.newPassword !== passwords.confirmPassword
-                }
-                helperText={
-                  passwords.confirmPassword !== "" &&
-                  passwords.newPassword !== passwords.confirmPassword
-                    ? "New passwords do not match"
-                    : ""
-                }
-              />
-            </Box>
-          </Box>
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            size="large"
-            fullWidth
-            sx={{
-              mt: 3,
-              py: 1.5,
-              position: "sticky",
-              bottom: 0,
-              zIndex: 10,
-            }}
-          >
-            Save Changes
-          </Button>
-        </Box>
-      </Paper>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2 }}
+                type="submit"
+              >
+                Save Changes
+              </Button>
+            </form>
+          </Paper>
+        )}
+      </Container>
     </Box>
   );
 };

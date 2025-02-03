@@ -1,6 +1,6 @@
 import { ThemeContextProvider } from "./state/ThemeContext";
 import Navbar from "./components/NavBar";
-import { Route, Routes, Navigate } from "react-router-dom"; // Import Navigate
+import { Route, Routes, Navigate } from "react-router-dom";
 import LandingPage from "./components/LandingPage";
 import SignInPage from "./components/SignInPage";
 import RegisterPage from "./components/RegisterPage";
@@ -8,6 +8,8 @@ import ProtectedRoute from "./routes/ProtectedRoutes";
 import HomePage from "./components/HomePage.tsx";
 import AnalyticsPage from "./components/AnalyticsPage";
 import SettingsPage from "./components/SettingsPage";
+import Footer from "./components/Footer";
+import InfoPage from "./components/InfoPage";
 
 const App = () => {
   return (
@@ -15,10 +17,7 @@ const App = () => {
       <Navbar />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route
-          path="/auth"
-          element={<Navigate to="/auth/signin" replace />}
-        />{" "}
+        <Route path="/auth" element={<Navigate to="/auth/signin" replace />} />
         <Route path="/auth/signin" element={<SignInPage />} />
         <Route path="/auth/register" element={<RegisterPage />} />
         <Route
@@ -45,7 +44,9 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/info" element={<InfoPage />} />{" "}
       </Routes>
+      <Footer />
     </ThemeContextProvider>
   );
 };

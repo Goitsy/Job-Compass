@@ -15,6 +15,7 @@ import {
 import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import { ThemeContext } from "../state/ThemeContext";
+import { signInWithGoogle, signInWithFacebook } from "../firebaseConfig";
 
 const SignInPage = () => {
   const { mode } = useContext(ThemeContext);
@@ -30,7 +31,7 @@ const SignInPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:2000/api/auth/login",
+        "http://localhost:5005/api/auth/login",
         signInData
       );
       console.log("Login response:", response.data);
@@ -47,6 +48,52 @@ const SignInPage = () => {
     } catch (error) {
       console.error("Sign In Error:", error);
       alert("Sign-in failed. Check your credentials and try again.");
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    const user = await signInWithGoogle();
+    if (user && user.displayName && user.email) {
+      try {
+        const response = await axios.post(
+          "http://localhost:5005/api/auth/google-login",
+          {
+            name: user.displayName,
+            email: user.email,
+          }
+        );
+        const { token } = response.data;
+        localStorage.setItem("token", token);
+        localStorage.setItem("userName", user.displayName);
+        navigate("/home");
+      } catch (error) {
+        console.error("Google Sign-In Backend Error:", error);
+      }
+    } else {
+      console.error("Google login failed: Missing user details.");
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    const user = await signInWithFacebook();
+    if (user && user.displayName && user.email) {
+      try {
+        const response = await axios.post(
+          "http://localhost:5005/api/auth/facebook-login",
+          {
+            name: user.displayName,
+            email: user.email,
+          }
+        );
+        const { token } = response.data;
+        localStorage.setItem("token", token);
+        localStorage.setItem("userName", user.displayName);
+        navigate("/home");
+      } catch (error) {
+        console.error("Facebook Sign-In Backend Error:", error);
+      }
+    } else {
+      console.error("Facebook login failed: Missing user details.");
     }
   };
 
@@ -117,16 +164,24 @@ const SignInPage = () => {
           </Button>
 
           <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <Box sx={{ width: "100%" }}>
-                <IconButton color="error" sx={{ width: "100%" }}>
+                <IconButton
+                  color="error"
+                  sx={{ width: "100%" }}
+                  onClick={handleGoogleLogin}
+                >
                   <GoogleIcon />
                 </IconButton>
               </Box>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <Box sx={{ width: "100%" }}>
-                <IconButton color="primary" sx={{ width: "100%" }}>
+                <IconButton
+                  color="primary"
+                  sx={{ width: "100%" }}
+                  onClick={handleFacebookLogin}
+                >
                   <FacebookIcon />
                 </IconButton>
               </Box>

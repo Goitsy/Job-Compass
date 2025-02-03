@@ -7,9 +7,14 @@ import {
   Paper,
   ToggleButton,
   ToggleButtonGroup,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import WorkIcon from "@mui/icons-material/Work";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import CancelIcon from "@mui/icons-material/Cancel";
 import { Bar } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 
@@ -17,6 +22,10 @@ Chart.register(...registerables);
 
 type AnalyticsData = {
   total: number;
+  applied: number;
+  interview: number;
+  inReview: number;
+  rejected: number;
   monthly: Record<
     string,
     { applied: number; interview: number; inReview: number; rejected: number }
@@ -31,222 +40,127 @@ const AnalyticsPage = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [view, setView] = useState<"monthly" | "yearly">("monthly");
 
+  const theme = useTheme();
+
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
     axios
-      .get("http://localhost:2000/api/analytics")
-      .then((response) => {
-        setAnalytics(response.data);
+      .get("http://localhost:5005/api/analytics", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
-      .catch((error) => {
-        console.error("Error fetching analytics:", error);
-      });
+      .then((response) => setAnalytics(response.data))
+      .catch((error) => console.error("Error fetching analytics:", error));
   }, []);
 
   if (!analytics) return <Typography>Loading...</Typography>;
 
-  const sortedMonths = Object.keys(analytics.monthly).sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
-  );
-  const monthlyLabels = sortedMonths.map((month) =>
-    new Date(month).toLocaleString("default", {
-      month: "short",
-      year: "numeric",
-    })
-  );
-
-  const sortedYears = Object.keys(analytics.yearly).sort();
-  const yearlyLabels = sortedYears;
-
-  const monthlyApplicationStatuses = {
-    applied: sortedMonths.map((month) => analytics.monthly[month].applied),
-    interview: sortedMonths.map((month) => analytics.monthly[month].interview),
-    inReview: sortedMonths.map((month) => analytics.monthly[month].inReview),
-    rejected: sortedMonths.map((month) => analytics.monthly[month].rejected),
-  };
-
-  const yearlyApplicationStatuses = {
-    applied: sortedYears.map((year) => analytics.yearly[year].applied),
-    interview: sortedYears.map((year) => analytics.yearly[year].interview),
-    inReview: sortedYears.map((year) => analytics.yearly[year].inReview),
-    rejected: sortedYears.map((year) => analytics.yearly[year].rejected),
-  };
-
-  const percentageChange = (current: number, previous: number) => {
-    if (previous === 0) return current > 0 ? 100 : 0;
-    return (((current - previous) / previous) * 100).toFixed(1);
-  };
-
-  const lastMonthKey = sortedMonths.slice(-2, -1)[0];
-  const currentMonthKey = sortedMonths.slice(-1)[0];
-  const lastMonthValue = analytics.monthly[lastMonthKey] || {
-    applied: 0,
-    interview: 0,
-    inReview: 0,
-    rejected: 0,
-  };
-  const currentMonthValue = analytics.monthly[currentMonthKey] || {
-    applied: 0,
-    interview: 0,
-    inReview: 0,
-    rejected: 0,
-  };
-
   const cards = [
-    {
-      title: "Total Applications",
-      value: analytics.total,
-      lastMonth:
-        lastMonthValue.applied +
-        lastMonthValue.interview +
-        lastMonthValue.inReview +
-        lastMonthValue.rejected,
-    },
+    { title: "Total Applications", value: analytics.total, icon: <WorkIcon /> },
     {
       title: "Applied Applications",
-      value: currentMonthValue.applied,
-      lastMonth: lastMonthValue.applied,
+      value: analytics.applied,
+      icon: <HowToRegIcon />,
     },
     {
       title: "Interview Applications",
-      value: currentMonthValue.interview,
-      lastMonth: lastMonthValue.interview,
+      value: analytics.interview,
+      icon: <TrendingUpIcon sx={{ color: "green" }} />,
     },
     {
       title: "In Review Applications",
-      value: currentMonthValue.inReview,
-      lastMonth: lastMonthValue.inReview,
+      value: analytics.inReview,
+      icon: <HourglassEmptyIcon />,
     },
     {
       title: "Rejected Applications",
-      value: currentMonthValue.rejected,
-      lastMonth: lastMonthValue.rejected,
+      value: analytics.rejected,
+      icon: <CancelIcon sx={{ color: "red" }} />,
     },
   ];
 
   return (
-    <>
-      <Box sx={{ p: 4 }}>
-        <Typography variant="h4" sx={{ p: 4, mt: 15 }} gutterBottom>
-          Analytics Overview
-        </Typography>
+    <Box sx={{ p: 4 }}>
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: 600,
+          color: theme.palette.text.primary,
+          p: 2,
+          mt: 4,
+          mb: 6,
+        }}
+        gutterBottom
+      >
+        Analytics Overview
+      </Typography>
 
-        <Grid
-          container
-          spacing={2}
-          sx={{ justifyContent: "flex-start", mb: 4 }}
+      <Grid container spacing={2}>
+        {cards.map((card, index) => (
+          <Grid item xs={12} sm={6} md={2.4} key={index}>
+            <Paper sx={{ p: 3, textAlign: "center" }}>
+              <Box>
+                {card.icon}
+                <Typography variant="h6">{card.title}</Typography>
+                <Typography variant="h4">{card.value}</Typography>
+              </Box>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Box sx={{ mt: 15, mb: 20 }}>
+        <ToggleButtonGroup
+          value={view}
+          exclusive
+          onChange={(_, newView) => setView(newView || "monthly")}
+          sx={{ mb: 3 }}
         >
-          {cards.map((card, index) => {
-            const change = percentageChange(
-              card.value,
-              card.lastMonth
-            ).toString();
-            const isPositive = parseFloat(change) >= 0;
+          <ToggleButton value="monthly">Monthly</ToggleButton>
+          <ToggleButton value="yearly">Yearly</ToggleButton>
+        </ToggleButtonGroup>
 
-            return (
-              <Grid item xs={8} sm={6} md={4} key={index}>
-                <Paper sx={{ p: 3, position: "relative", overflow: "hidden" }}>
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: 16,
-                      right: 16,
-                      color: isPositive ? "green" : "red",
-                    }}
-                  >
-                    {isPositive ? <TrendingUpIcon /> : <TrendingDownIcon />}
-                  </Box>
-
-                  <Typography variant="h6">{card.title}</Typography>
-                  <Typography variant="h4">{card.value}</Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: isPositive ? "green" : "red" }}
-                  >
-                    {isPositive ? "+" : ""}
-                    {change}% since last month
-                  </Typography>
-                </Paper>
-              </Grid>
-            );
-          })}
-        </Grid>
-
-        <Box sx={{ mt: 5 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2,
-            }}
-          >
-            <Typography variant="h5" gutterBottom>
-              {view === "monthly" ? "Monthly" : "Yearly"} Applications Chart
-            </Typography>
-            <ToggleButtonGroup
-              value={view}
-              exclusive
-              onChange={(_, newView) => setView(newView)}
-              aria-label="view"
-            >
-              <ToggleButton value="monthly" aria-label="monthly">
-                Monthly
-              </ToggleButton>
-              <ToggleButton value="yearly" aria-label="yearly">
-                Yearly
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Box>
+        <Box sx={{ width: "100%", maxWidth: "75%", margin: "0 auto" }}>
           <Bar
             data={{
-              labels: view === "monthly" ? monthlyLabels : yearlyLabels,
+              labels:
+                view === "monthly"
+                  ? Object.keys(analytics.monthly)
+                  : Object.keys(analytics.yearly),
               datasets: [
                 {
-                  label: "Applied Applications",
+                  label: "Applied",
                   data:
                     view === "monthly"
-                      ? monthlyApplicationStatuses.applied
-                      : yearlyApplicationStatuses.applied,
-                  backgroundColor: "#248ae7", // Blue for "Applied"
-                  borderColor: "darkblue",
-                  borderWidth: 2,
-                  borderRadius: 5,
-                  barThickness: 50,
+                      ? Object.values(analytics.monthly).map((m) => m.applied)
+                      : Object.values(analytics.yearly).map((y) => y.applied),
+                  backgroundColor: "#248ae7",
                 },
                 {
-                  label: "Interview Applications",
+                  label: "Interview",
                   data:
                     view === "monthly"
-                      ? monthlyApplicationStatuses.interview
-                      : yearlyApplicationStatuses.interview,
+                      ? Object.values(analytics.monthly).map((m) => m.interview)
+                      : Object.values(analytics.yearly).map((y) => y.interview),
                   backgroundColor: "#58BA51",
-                  borderColor: "darkgreen",
-                  borderWidth: 2,
-                  borderRadius: 5,
-                  barThickness: 50,
                 },
                 {
-                  label: "In Review Applications",
+                  label: "In Review",
                   data:
                     view === "monthly"
-                      ? monthlyApplicationStatuses.inReview
-                      : yearlyApplicationStatuses.inReview,
+                      ? Object.values(analytics.monthly).map((m) => m.inReview)
+                      : Object.values(analytics.yearly).map((y) => y.inReview),
                   backgroundColor: "#6d46d2",
-                  borderWidth: 2,
-                  borderRadius: 5,
-                  barThickness: 50,
                 },
                 {
-                  label: "Rejected Applications",
+                  label: "Rejected",
                   data:
                     view === "monthly"
-                      ? monthlyApplicationStatuses.rejected
-                      : yearlyApplicationStatuses.rejected,
+                      ? Object.values(analytics.monthly).map((m) => m.rejected)
+                      : Object.values(analytics.yearly).map((y) => y.rejected),
                   backgroundColor: "red",
-                  borderColor: "darkred",
-                  borderWidth: 2,
-                  borderRadius: 5,
-                  barThickness: 50,
                 },
               ],
             }}
@@ -257,40 +171,12 @@ const AnalyticsPage = () => {
                   display: true,
                   position: "top",
                 },
-                tooltip: {
-                  callbacks: {
-                    label: (tooltipItem) =>
-                      `${tooltipItem.raw} applications in ${tooltipItem.label}`,
-                  },
-                },
-              },
-              scales: {
-                x: {
-                  title: {
-                    display: true,
-                    text: view === "monthly" ? "Months" : "Years",
-                    color: "#333",
-                    font: { size: 14, weight: "bold" },
-                  },
-                  grid: {
-                    display: false,
-                  },
-                },
-                y: {
-                  title: {
-                    display: true,
-                    text: "Number of Applications",
-                    color: "#333",
-                    font: { size: 14, weight: "bold" },
-                  },
-                  beginAtZero: true,
-                },
               },
             }}
           />
         </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 
