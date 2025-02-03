@@ -341,20 +341,15 @@ const SettingsPage: React.FC = () => {
   return (
     <Box
       sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        p: 4,
+        minWidth: "100vw",
         minHeight: "100vh",
-        width: "100vw",
-        height: "100vh",
-        overflow: "auto",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        p: 0,
-        m: 0,
-        boxSizing: "border-box",
-        backgroundColor: "background.default",
+        background:
+          mode === "light"
+            ? "linear-gradient(to bottom, #ffffff, #7C3AED,#ffffff)"
+            : "linear-gradient(to bottom, #121212, #1f1f1f)",
+        alignItems: "center",
+        position: "relative",
       }}
     >
       <Paper
