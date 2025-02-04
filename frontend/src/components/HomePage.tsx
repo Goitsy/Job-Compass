@@ -79,6 +79,7 @@ const glowAnimation = keyframes`
   }
 `;
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 const HomePage = () => {
   const { mode } = useContext(ThemeContext);
   const [applications, setApplications] = useState<JobApplication[]>([]);
@@ -110,7 +111,7 @@ const HomePage = () => {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:2000/api/settings", {
+        const response = await axios.get("/api/settings", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -138,7 +139,7 @@ const HomePage = () => {
 
   const fetchApplications = async () => {
     try {
-      const response = await axios.get("http://localhost:2000/api/jobapp", {
+      const response = await axios.get("/api/jobapp", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setApplications(response.data);
@@ -218,7 +219,7 @@ const HomePage = () => {
     try {
       if (editId) {
         const editResponse = await axios.put(
-          `http://localhost:2000/api/jobapp/${editId}`,
+          `/api/jobapp/${editId}`,
           formData,
           {
             headers: {
@@ -228,7 +229,7 @@ const HomePage = () => {
         );
         setEditId(null);
       } else {
-        await axios.post("http://localhost:2000/api/jobapp", formData, {
+        await axios.post("/api/jobapp", formData, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
       }
@@ -247,7 +248,7 @@ const HomePage = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:2000/api/jobapp/${id}`, {
+      await axios.delete(`/api/jobapp/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       fetchApplications();
@@ -270,7 +271,7 @@ const HomePage = () => {
     try {
       if (currentAppId) {
         await axios.post(
-          `http://localhost:2000/api/jobapp/update-status`,
+          `/api/jobapp/update-status`,
           { id: currentAppId, status },
           {
             headers: {
