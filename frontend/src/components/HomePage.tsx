@@ -241,6 +241,11 @@ const HomePage = () => {
   };
 
   const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this application?"
+    );
+    if (!confirmDelete) return;
+
     try {
       await axios.delete(`http://localhost:2000/api/jobapp/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
