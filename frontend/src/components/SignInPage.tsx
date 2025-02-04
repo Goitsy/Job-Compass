@@ -17,6 +17,8 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import { ThemeContext } from "../state/ThemeContext";
 import { signInWithGoogle, signInWithFacebook } from "../firebaseConfig";
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+
 const SignInPage = () => {
   const { mode } = useContext(ThemeContext);
   const [signInData, setSignInData] = useState({ email: "", password: "" });
@@ -30,10 +32,7 @@ const SignInPage = () => {
   const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:5005/api/auth/login",
-        signInData
-      );
+      const response = await axios.post("/api/auth/login", signInData);
       console.log("Login response:", response.data);
       const { token, user } = response.data;
       const { name } = user;
@@ -55,13 +54,10 @@ const SignInPage = () => {
     const user = await signInWithGoogle();
     if (user && user.displayName && user.email) {
       try {
-        const response = await axios.post(
-          "http://localhost:5005/api/auth/google-login",
-          {
-            name: user.displayName,
-            email: user.email,
-          }
-        );
+        const response = await axios.post("/api/auth/google-login", {
+          name: user.displayName,
+          email: user.email,
+        });
         const { token } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("userName", user.displayName);
@@ -78,13 +74,10 @@ const SignInPage = () => {
     const user = await signInWithFacebook();
     if (user && user.displayName && user.email) {
       try {
-        const response = await axios.post(
-          "http://localhost:5005/api/auth/facebook-login",
-          {
-            name: user.displayName,
-            email: user.email,
-          }
-        );
+        const response = await axios.post("/api/auth/facebook-login", {
+          name: user.displayName,
+          email: user.email,
+        });
         const { token } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("userName", user.displayName);
