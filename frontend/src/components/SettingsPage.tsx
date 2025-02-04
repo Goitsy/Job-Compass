@@ -80,7 +80,7 @@ const SettingsPage: React.FC = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:2000/api/settings", {
+      const response = await fetch("/api/settings", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -113,7 +113,7 @@ const SettingsPage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
-      setError(error instanceof Error ? "Unable to load settings" : "");
+      setError(error instanceof Error ? "" : "");
     } finally {
       setLoading(false);
     }
@@ -151,7 +151,7 @@ const SettingsPage: React.FC = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:2000/api/settings/upload-profile-picture",
+        "/api/settings/upload-profile-picture",
         formData,
         {
           headers: {

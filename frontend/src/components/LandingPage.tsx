@@ -201,8 +201,6 @@ const LandingPage = () => {
           <Typography variant="body2">Success Rate</Typography>
         </Box>
       </Box>
-
-      <Footer />
     </>
   );
 };
