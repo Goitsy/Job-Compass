@@ -23,6 +23,8 @@ import {
   UserCredential,
 } from "firebase/auth";
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+
 const RegisterPage = () => {
   const { mode } = useContext(ThemeContext);
   const [registerData, setRegisterData] = useState({
@@ -40,10 +42,7 @@ const RegisterPage = () => {
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:2000/api/auth/register",
-        registerData
-      );
+      const response = await axios.post("/api/auth/register", registerData);
       alert("Registration successful! Please sign in.");
       console.log("Register Success:", response.data);
 
@@ -59,13 +58,10 @@ const RegisterPage = () => {
     const user = await signInWithGoogle();
     if (user && user.displayName && user.email) {
       try {
-        const response = await axios.post(
-          "http://localhost:2000/api/auth/google-register",
-          {
-            name: user.displayName,
-            email: user.email,
-          }
-        );
+        const response = await axios.post("/api/auth/google-register", {
+          name: user.displayName,
+          email: user.email,
+        });
         const { token } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("userName", user.displayName);
@@ -87,13 +83,10 @@ const RegisterPage = () => {
       const user = userCredential.user;
 
       if (user && user.displayName && user.email) {
-        const response = await axios.post(
-          "http://localhost:2000/api/auth/facebook-register",
-          {
-            name: user.displayName,
-            email: user.email,
-          }
-        );
+        const response = await axios.post("/api/auth/facebook-register", {
+          name: user.displayName,
+          email: user.email,
+        });
         const { token } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("userName", user.displayName);

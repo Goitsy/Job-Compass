@@ -36,6 +36,8 @@ type AnalyticsData = {
   >;
 };
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+
 const AnalyticsPage = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [view, setView] = useState<"monthly" | "yearly">("monthly");

@@ -28,6 +28,7 @@ interface UserSettings {
   emailNotification: boolean;
   profilePicture?: string;
 }
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
