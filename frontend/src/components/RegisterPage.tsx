@@ -39,8 +39,22 @@ const RegisterPage = () => {
     setRegisterData({ ...registerData, [e.target.name]: e.target.value });
   };
 
+  const validatePassword = (password: string) => {
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validatePassword(registerData.password)) {
+      alert(
+        "Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character."
+      );
+      return;
+    }
+
     try {
       const response = await axios.post("/api/auth/register", registerData);
       alert("Registration successful! Please sign in.");

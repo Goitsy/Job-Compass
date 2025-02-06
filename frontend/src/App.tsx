@@ -10,6 +10,7 @@ import AnalyticsPage from "./components/AnalyticsPage";
 import SettingsPage from "./components/SettingsPage";
 import Footer from "./components/Footer";
 import InfoPage from "./components/InfoPage";
+import "./App.css";
 
 const App = () => {
   return (

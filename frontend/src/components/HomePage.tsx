@@ -12,7 +12,6 @@ import {
   Select,
   InputLabel,
   FormControl,
-  Grid,
   Pagination,
   InputAdornment,
   Chip,
@@ -31,6 +30,7 @@ import { SelectChangeEvent } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { keyframes } from "@mui/system";
+import "../App.css";
 
 interface JobApplication {
   _id: string;
@@ -122,7 +122,6 @@ const HomePage = () => {
 
         setUserProfile(profileData);
 
-        // Store in localStorage for persistent display
         localStorage.setItem("userName", profileData.name);
         localStorage.setItem("userProfilePicture", profileData.profilePicture);
       } catch (error) {
@@ -213,20 +212,15 @@ const HomePage = () => {
       });
     }
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (editId) {
-        const editResponse = await axios.put(
-          `/api/jobapp/${editId}`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        await axios.put(`/api/jobapp/${editId}`, formData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         setEditId(null);
       } else {
         await axios.post("/api/jobapp", formData, {
@@ -270,7 +264,7 @@ const HomePage = () => {
   const handleStatusUpdate = async (status: string) => {
     try {
       if (currentAppId) {
-        await axios.post(
+        await axios.put(
           `/api/jobapp/update-status`,
           { id: currentAppId, status },
           {
@@ -306,11 +300,11 @@ const HomePage = () => {
         alignItems: "center",
         position: "relative",
         paddingTop: {
-          xs: "100px", // Smaller screens
-          sm: "120px", // Small screens
-          md: "150px", // Medium screens
-          lg: "180px", // Large screens
-          xl: "200px", // Extra large screens
+          xs: "100px",
+          sm: "120px",
+          md: "150px",
+          lg: "180px",
+          xl: "200px",
         },
       }}
     >
@@ -320,8 +314,8 @@ const HomePage = () => {
           alignItems: "center",
           mb: 4,
           flexDirection: {
-            xs: "column", // Stack on very small screens
-            sm: "row", // Side by side on small screens and up
+            xs: "column",
+            sm: "row",
           },
           justifyContent: "center",
           textAlign: {
@@ -335,10 +329,10 @@ const HomePage = () => {
           alt={`${userProfile.name}'s profile`}
           sx={{
             width: {
-              xs: 120, // Smaller on very small screens
-              sm: 150, // Larger on small screens
-              md: 200, // Even larger on medium screens
-              lg: 250, // Largest on large screens
+              xs: 120,
+              sm: 150,
+              md: 200,
+              lg: 250,
             },
             height: {
               xs: 120,
@@ -347,12 +341,12 @@ const HomePage = () => {
               lg: 250,
             },
             mr: {
-              xs: 0, // No margin on very small screens
-              sm: 2, // Add margin on small screens and up
+              xs: 0,
+              sm: 2,
             },
             mb: {
-              xs: 2, // Bottom margin on very small screens
-              sm: 0, // No bottom margin on small screens and up
+              xs: 2,
+              sm: 0,
             },
             border: "4px solid #7C3AED",
             boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
@@ -375,14 +369,14 @@ const HomePage = () => {
           sx={{
             color: mode === "light" ? "#121212" : "#ffffff",
             fontSize: {
-              xs: "2rem", // Smaller on very small screens
-              sm: "2.5rem", // Medium on small screens
-              md: "3rem", // Large on medium screens
-              lg: "3.5rem", // Largest on large screens
+              xs: "2rem",
+              sm: "2.5rem",
+              md: "3rem",
+              lg: "3.5rem",
             },
             mt: {
-              xs: 2, // Top margin on very small screens
-              sm: 0, // No top margin on small screens and up
+              xs: 2,
+              sm: 0,
             },
           }}
           gutterBottom

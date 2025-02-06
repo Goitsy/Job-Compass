@@ -7,7 +7,6 @@ import {
   Paper,
   ToggleButton,
   ToggleButtonGroup,
-  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -113,6 +112,7 @@ const AnalyticsPage = () => {
         ))}
       </Grid>
 
+      {/*make chart below wider*/}
       <Box sx={{ mt: 15, mb: 20 }}>
         <ToggleButtonGroup
           value={view}
@@ -123,8 +123,16 @@ const AnalyticsPage = () => {
           <ToggleButton value="monthly">Monthly</ToggleButton>
           <ToggleButton value="yearly">Yearly</ToggleButton>
         </ToggleButtonGroup>
-
-        <Box sx={{ width: "100%", maxWidth: "75%", margin: "0 auto" }}>
+        <Box
+          sx={{
+            mt: 15,
+            mb: 10,
+            width: "100%",
+            maxWidth: { xs: "100%", sm: "90%", height: 600 },
+            margin: "0 auto",
+            overflowX: "auto",
+          }}
+        >
           <Bar
             data={{
               labels:
@@ -168,6 +176,7 @@ const AnalyticsPage = () => {
             }}
             options={{
               responsive: true,
+              maintainAspectRatio: false,
               plugins: {
                 legend: {
                   display: true,

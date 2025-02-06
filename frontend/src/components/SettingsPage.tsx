@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Box,
-  Container,
   Typography,
   TextField,
   Switch,
@@ -11,8 +10,6 @@ import {
   Paper,
   FormControlLabel,
   Alert,
-  CircularProgress,
-  Divider,
   Avatar,
   IconButton,
 } from "@mui/material";
@@ -29,6 +26,7 @@ interface UserSettings {
   profilePicture?: string;
 }
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { mode, toggleMode } = useContext(ThemeContext);
@@ -80,7 +78,7 @@ const SettingsPage: React.FC = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:5005/api/settings", {
+      const response = await fetch("/api/settings", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -113,7 +111,7 @@ const SettingsPage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
-      setError(error instanceof Error ? "Unable to load settings" : "");
+      setError(error instanceof Error ? "" : "");
     } finally {
       setLoading(false);
     }
@@ -151,7 +149,7 @@ const SettingsPage: React.FC = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:5005/api/settings/upload-profile-picture",
+        "/api/settings/upload-profile-picture",
         formData,
         {
           headers: {
@@ -192,7 +190,6 @@ const SettingsPage: React.FC = () => {
     const { name, value } = e.target;
     setPasswords((prev) => ({ ...prev, [name]: value }));
 
-    // Clear any existing errors when user starts typing
     if (error) {
       setError("");
     }
@@ -205,7 +202,6 @@ const SettingsPage: React.FC = () => {
       [name]: value,
     }));
 
-    // Add validation for name change
     if (name === "newName") {
       setProfileChanges((prev) => ({
         ...prev,
@@ -214,7 +210,6 @@ const SettingsPage: React.FC = () => {
       }));
     }
 
-    // Clear any existing errors when user starts typing
     if (error) {
       setError("");
     }
@@ -258,7 +253,6 @@ const SettingsPage: React.FC = () => {
         return;
       }
 
-      // Prepare settings update payload
       const updatePayload: any = {
         name: profileChanges.newName || settings.name,
         theme: settings.theme,
@@ -267,7 +261,6 @@ const SettingsPage: React.FC = () => {
         emailNotification: emailNotification,
       };
 
-      // Add email if changed and confirmed
       if (
         profileChanges.newEmail &&
         profileChanges.newEmail === profileChanges.confirmNewEmail
@@ -275,7 +268,6 @@ const SettingsPage: React.FC = () => {
         updatePayload.email = profileChanges.newEmail;
       }
 
-      // Add password change if attempting to change
       if (passwords.newPassword) {
         if (passwords.newPassword !== passwords.confirmPassword) {
           setError("New passwords do not match");
@@ -286,9 +278,8 @@ const SettingsPage: React.FC = () => {
         updatePayload.newPassword = passwords.newPassword;
       }
 
-      // Send update request
       const response = await axios.patch(
-        "http://localhost:2000/api/settings/update",
+        "/api/settings/update",
         updatePayload,
         {
           headers: {
@@ -298,13 +289,11 @@ const SettingsPage: React.FC = () => {
         }
       );
 
-      // Update local state with response
       setSettings((prev) => ({
         ...prev,
         ...response.data,
       }));
 
-      // Reset form states
       setProfileChanges({
         currentName: response.data.name || profileChanges.currentName,
         newName: "",
@@ -341,15 +330,16 @@ const SettingsPage: React.FC = () => {
   return (
     <Box
       sx={{
-        p: 4,
-        minWidth: "100vw",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         minHeight: "100vh",
         background:
           mode === "light"
             ? "linear-gradient(to bottom, #ffffff, #7C3AED,#ffffff)"
             : "linear-gradient(to bottom, #121212, #1f1f1f)",
-        alignItems: "center",
         position: "relative",
+        p: 4,
       }}
     >
       <Paper
@@ -360,6 +350,7 @@ const SettingsPage: React.FC = () => {
           minHeight: "80vh",
           maxHeight: "95vh",
           overflowY: "auto",
+          mt: "50",
           p: {
             xs: 2,
             sm: 3,
