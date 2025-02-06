@@ -13,6 +13,8 @@ dist
 dist-ssr
 *.local
 
+firebaseConfig.ts
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
