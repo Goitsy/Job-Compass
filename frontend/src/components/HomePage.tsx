@@ -31,6 +31,7 @@ import { SelectChangeEvent } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { keyframes } from "@mui/system";
+import { useTheme } from "@mui/material";
 
 interface JobApplication {
   _id: string;
@@ -80,8 +81,10 @@ const glowAnimation = keyframes`
 `;
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+
 const HomePage = () => {
   const { mode } = useContext(ThemeContext);
+  const theme = useTheme();
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [formVisible, setFormVisible] = useState(false);
   const [formData, setFormData] = useState<Partial<JobApplication>>({});
@@ -270,7 +273,7 @@ const HomePage = () => {
   const handleStatusUpdate = async (status: string) => {
     try {
       if (currentAppId) {
-        await axios.post(
+        await axios.put(
           `/api/jobapp/update-status`,
           { id: currentAppId, status },
           {
@@ -300,9 +303,11 @@ const HomePage = () => {
         minWidth: "100vw",
         minHeight: "100vh",
         background:
-          mode === "light"
-            ? "linear-gradient(to bottom, #ffffff, #7C3AED,#ffffff)"
-            : "linear-gradient(to bottom, #121212, #1f1f1f)",
+          theme.palette.mode === "light"
+            ? "linear-gradient(to bottom, #ffffff, #7C3AED, #ffffff)"
+            : "linear-gradient(to bottom, #121212, #1e1e1e)",
+        color: theme.palette.mode === "light" ? "#000000" : "#ffffff",
+
         alignItems: "center",
         position: "relative",
         paddingTop: {
@@ -371,21 +376,15 @@ const HomePage = () => {
           }}
         />
         <Typography
-          variant="h2"
+          variant="h4"
           sx={{
-            color: mode === "light" ? "#121212" : "#ffffff",
-            fontSize: {
-              xs: "2rem", // Smaller on very small screens
-              sm: "2.5rem", // Medium on small screens
-              md: "3rem", // Large on medium screens
-              lg: "3.5rem", // Largest on large screens
-            },
-            mt: {
-              xs: 2, // Top margin on very small screens
-              sm: 0, // No top margin on small screens and up
-            },
+            fontWeight: 500,
+            color: theme.palette.mode === "light" ? "#333" : "#fff",
+            textShadow:
+              theme.palette.mode === "light"
+                ? "1px 1px 2px rgba(0, 0, 0, 0.2)"
+                : "1px 1px 2px rgba(255, 255, 255, 0.2)",
           }}
-          gutterBottom
         >
           Welcome, {userProfile.name}
         </Typography>
@@ -394,14 +393,40 @@ const HomePage = () => {
       <Button
         startIcon={<Add />}
         variant="contained"
-        color="primary"
         onClick={toggleForm}
-        sx={{ mb: 2 }}
+        sx={{
+          mb: 2,
+          px: 3, // По-широк padding
+          py: 1.5, // По-висок бутон
+          fontSize: "1rem",
+          fontWeight: "bold",
+          background: "linear-gradient(135deg, #9B51E0, #7C3AED)", // По-елегантен градиент
+          borderRadius: "10px", // Леко заоблени ъгли
+          boxShadow: "0 4px 10px rgba(124, 58, 237, 0.3)", // Лека сянка
+          transition: "all 0.3s ease-in-out",
+          "&:hover": {
+            background: "linear-gradient(135deg, #7C3AED, #5A189A)", // По-тъмен градиент при hover
+            boxShadow: "0 6px 15px rgba(124, 58, 237, 0.5)", // По-силна сянка при hover
+            transform: "scale(1.05)", // Леко увеличение при hover
+          },
+        }}
       >
         Add Application
       </Button>
 
-      <Box sx={{ display: "flex", gap: 2, mb: 4, mt: 5 }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          mb: 4,
+          mt: 5,
+          justifyContent: "center",
+          width: "100%",
+          maxWidth: "560px",
+          margin: "0 auto",
+        }}
+      >
+        {/* Search Bar */}
         <TextField
           label="Search"
           variant="outlined"
@@ -410,16 +435,56 @@ const HomePage = () => {
           fullWidth
           InputProps={{
             startAdornment: (
-              <InputAdornment position="start">🔍</InputAdornment>
+              <InputAdornment position="start">
+                <span style={{ color: "#7C3AED", fontSize: "1.2rem" }}>🔍</span>
+              </InputAdornment>
             ),
           }}
+          sx={{
+            backgroundColor: mode === "light" ? "#F5F5F5" : "#2C2C2C",
+            borderRadius: "10px",
+            height: "50px",
+            boxShadow:
+              mode === "light"
+                ? "0 4px 10px rgba(0, 0, 0, 0.1)"
+                : "0 4px 10px rgba(255, 255, 255, 0.1)",
+            "& .MuiOutlinedInput-root": {
+              height: "50px",
+              fontSize: "1rem",
+              color: mode === "light" ? "#333" : "#EAE6FF",
+              "& fieldset": { borderColor: "transparent" },
+              "&:hover fieldset": { borderColor: "#9B51E0" },
+              "&.Mui-focused fieldset": { borderColor: "#7C3AED" },
+            },
+          }}
         />
-        <FormControl fullWidth>
-          <InputLabel>Sort By</InputLabel>
+
+        {/* Sort By Dropdown */}
+        <FormControl fullWidth sx={{ height: "50px" }}>
+          <InputLabel sx={{ color: mode === "light" ? "#333" : "#EAE6FF" }}>
+            Sort By
+          </InputLabel>
           <Select
             value={`${sortBy}-${sortOrder}`}
             onChange={handleSortChange}
             label="Sort By"
+            sx={{
+              backgroundColor: mode === "light" ? "#F5F5F5" : "#2C2C2C",
+              borderRadius: "10px",
+              height: "50px",
+              color: mode === "light" ? "#333" : "#EAE6FF",
+              fontSize: "1rem",
+              boxShadow:
+                mode === "light"
+                  ? "0 4px 10px rgba(0, 0, 0, 0.1)"
+                  : "0 4px 10px rgba(255, 255, 255, 0.1)",
+              "& .MuiOutlinedInput-root": {
+                height: "50px",
+                "& fieldset": { borderColor: "transparent" },
+                "&:hover fieldset": { borderColor: "#9B51E0" },
+                "&.Mui-focused fieldset": { borderColor: "#7C3AED" },
+              },
+            }}
           >
             <MenuItem value="dateOfApplication-asc">Date (Ascending)</MenuItem>
             <MenuItem value="dateOfApplication-desc">
@@ -439,6 +504,13 @@ const HomePage = () => {
             p: 3,
             maxWidth: "400px",
             zIndex: 10,
+            backgroundColor: "white",
+            borderRadius: "16px",
+            boxShadow: "0 12px 24px rgba(0, 0, 0, 0.2)", // Подобрена сянка
+            transition: "all 0.3s ease-in-out",
+            "&:hover": {
+              boxShadow: "0 16px 32px rgba(0, 0, 0, 0.3)", // Повдигане при hover
+            },
           }}
         >
           <IconButton
@@ -455,6 +527,13 @@ const HomePage = () => {
               value={formData.jobUrl || ""}
               onChange={handleChange}
               margin="normal"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#9B51E0" },
+                  "&:hover fieldset": { borderColor: "#7C3AED" },
+                  "&.Mui-focused fieldset": { borderColor: "#9B51E0" },
+                },
+              }}
             />
             <TextField
               fullWidth
@@ -463,6 +542,13 @@ const HomePage = () => {
               value={formData.jobTitle || ""}
               onChange={handleChange}
               margin="normal"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#9B51E0" },
+                  "&:hover fieldset": { borderColor: "#7C3AED" },
+                  "&.Mui-focused fieldset": { borderColor: "#9B51E0" },
+                },
+              }}
             />
             <Box sx={{ marginBottom: 2 }}>
               <Typography>Date of Application</Typography>
@@ -494,6 +580,13 @@ const HomePage = () => {
               value={formData.company || ""}
               onChange={handleChange}
               margin="normal"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#9B51E0" },
+                  "&:hover fieldset": { borderColor: "#7C3AED" },
+                  "&.Mui-focused fieldset": { borderColor: "#9B51E0" },
+                },
+              }}
             />
             <TextField
               fullWidth
@@ -502,6 +595,13 @@ const HomePage = () => {
               value={formData.location || ""}
               onChange={handleChange}
               margin="normal"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#9B51E0" },
+                  "&:hover fieldset": { borderColor: "#7C3AED" },
+                  "&.Mui-focused fieldset": { borderColor: "#9B51E0" },
+                },
+              }}
             />
             <FormControl fullWidth margin="normal">
               <InputLabel>Status</InputLabel>
@@ -510,6 +610,13 @@ const HomePage = () => {
                 onChange={handleStatusChange}
                 label="Status"
                 name="status"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#9B51E0" },
+                    "&:hover fieldset": { borderColor: "#7C3AED" },
+                    "&.Mui-focused fieldset": { borderColor: "#9B51E0" },
+                  },
+                }}
               >
                 <MenuItem value="Interview">Interview</MenuItem>
                 <MenuItem value="Rejected">Rejected</MenuItem>
@@ -521,7 +628,11 @@ const HomePage = () => {
               type="submit"
               variant="contained"
               color="primary"
-              sx={{ mt: 2 }}
+              sx={{
+                mt: 2,
+                backgroundColor: "#9B51E0",
+                "&:hover": { backgroundColor: "#7C3AED" },
+              }}
             >
               {editId ? "Update Application" : "Add Application"}
             </Button>
@@ -552,8 +663,8 @@ const HomePage = () => {
               borderRadius: "12px",
               borderLeft: `6px solid ${statusColors[app.status] || "gray"}`,
               width: "100%",
-              maxWidth: "600px",
-              margin: "10px 0",
+              maxWidth: "800px",
+              margin: "20px 0",
               boxShadow: 3,
               transition: "transform 0.2s, box-shadow 0.2s",
               "&:hover": {
@@ -665,7 +776,12 @@ const HomePage = () => {
         page={page}
         onChange={handlePageChange}
         color="primary"
-        sx={{ mt: 5, display: "flex", justifyContent: "center" }}
+        sx={{
+          mt: 5,
+          display: "flex",
+          justifyContent: "center",
+          "& .MuiPaginationItem-root": { color: "white" }, // Променете цвета на точките на бял
+        }}
       />
     </Box>
   );

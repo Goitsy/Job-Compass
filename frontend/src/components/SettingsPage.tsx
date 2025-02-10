@@ -29,6 +29,8 @@ interface UserSettings {
   profilePicture?: string;
 }
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { mode, toggleMode } = useContext(ThemeContext);
@@ -80,7 +82,7 @@ const SettingsPage: React.FC = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:5005/api/settings", {
+      const response = await fetch("/api/settings", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -151,7 +153,7 @@ const SettingsPage: React.FC = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:5005/api/settings/upload-profile-picture",
+        "/api/settings/upload-profile-picture",
         formData,
         {
           headers: {
@@ -288,7 +290,7 @@ const SettingsPage: React.FC = () => {
 
       // Send update request
       const response = await axios.patch(
-        "http://localhost:2000/api/settings/update",
+        "/api/settings/update",
         updatePayload,
         {
           headers: {
@@ -341,15 +343,16 @@ const SettingsPage: React.FC = () => {
   return (
     <Box
       sx={{
-        p: 4,
-        minWidth: "100vw",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         minHeight: "100vh",
         background:
           mode === "light"
-            ? "linear-gradient(to bottom, #ffffff, #7C3AED,#ffffff)"
+            ? "linear-gradient(to bottom, #4c4f8c, #b87dd8)"
             : "linear-gradient(to bottom, #121212, #1f1f1f)",
-        alignItems: "center",
         position: "relative",
+        p: 4,
       }}
     >
       <Paper
@@ -384,7 +387,7 @@ const SettingsPage: React.FC = () => {
         }}
       >
         <Typography
-          variant="h4"
+          variant="h2"
           align="center"
           gutterBottom
           sx={{
@@ -394,6 +397,8 @@ const SettingsPage: React.FC = () => {
             backgroundColor: "background.paper",
             pt: 2,
             pb: 1,
+            color: "#A0A0A0",
+            textShadow: "2px 2px 6px rgba(0, 0, 0, 0.1)",
           }}
         >
           Settings
@@ -477,6 +482,23 @@ const SettingsPage: React.FC = () => {
                       variant="contained"
                       component="span"
                       startIcon={<PhotoCamera />}
+                      sx={{
+                        background: "linear-gradient(135deg, #9B51E0, #7C3AED)",
+                        color: "#fff",
+                        borderRadius: "10px",
+                        fontSize: "1rem",
+                        fontWeight: "bold",
+                        px: 3,
+                        py: 1.5,
+                        boxShadow: "0 4px 10px rgba(124, 58, 237, 0.3)",
+                        transition: "all 0.3s ease-in-out",
+                        "&:hover": {
+                          background:
+                            "linear-gradient(135deg, #7C3AED, #5A189A)",
+                          boxShadow: "0 6px 15px rgba(124, 58, 237, 0.5)",
+                          transform: "scale(1.05)",
+                        },
+                      }}
                     >
                       Change Profile Picture
                     </Button>
@@ -686,7 +708,6 @@ const SettingsPage: React.FC = () => {
             <Button
               type="submit"
               variant="contained"
-              color="primary"
               size="large"
               fullWidth
               sx={{
@@ -695,6 +716,20 @@ const SettingsPage: React.FC = () => {
                 position: "sticky",
                 bottom: 0,
                 zIndex: 10,
+                background: "linear-gradient(135deg, #9B51E0, #7C3AED)", // Градиентен фон
+                color: "#fff",
+                borderRadius: "12px",
+                fontWeight: "bold",
+                boxShadow: "0 4px 12px rgba(124, 58, 237, 0.3)", // По-мека сянка
+                transition: "all 0.3s ease-in-out",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #7C3AED, #5a2ca6)", // По-тъмен градиент
+                  boxShadow: "0 6px 16px rgba(124, 58, 237, 0.5)", // По-силна сянка при hover
+                  transform: "scale(1.02)", // Лек zoom ефект
+                },
+                "&:active": {
+                  transform: "scale(0.98)", // Леко "натискане" при клик
+                },
               }}
             >
               Save Changes
