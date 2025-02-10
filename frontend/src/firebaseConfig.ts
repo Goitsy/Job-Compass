@@ -7,13 +7,13 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  apiKey: "AIzaSyCSXWvjWb1-Fchmy4EpwriktTQWGWG_yZw",
+  authDomain: "job-compass-12c91.firebaseapp.com",
+  projectId: "job-compass-12c91",
+  storageBucket: "job-compass-12c91.firebasestorage.app",
+  messagingSenderId: "601158408495",
+  appId: "1:601158408495:web:a65e85b119ee7750b569da",
+  measurementId: "G-Z7V6MMM9X9",
 };
 
 const app = initializeApp(firebaseConfig);
