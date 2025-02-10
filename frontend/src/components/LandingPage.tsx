@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import office from "../assets/office.jpeg";
 import { CheckCircle, BarChart, Notifications } from "@mui/icons-material";
+
 import CountUp from "react-countup";
 
 // Анимация за текста
@@ -17,6 +18,8 @@ const float = keyframes`
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0); }
 `;
+
+
 
 const LandingPage = () => {
   const theme = useTheme();
@@ -275,28 +278,7 @@ const LandingPage = () => {
       </Box>
 
       {/* Footer Section */}
-      <Box
-        component="footer"
-        sx={{
-          width: "100%",
-          backgroundColor: "black",
-          color: "white",
-          textAlign: "center",
-          padding: "20px 0",
-          position: "relative", // Гарантира, че футърът остава под лилавата лента
-        }}
-      >
-        <Typography variant="h6">Job Compass</Typography>
-        <Typography variant="body2">
-          Your career navigation tool to help you find, track, and manage job
-          applications.
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>
-          © {new Date().getFullYear()} Job Compass, All rights reserved.
-        </Typography>
-      </Box>console.log("Landing Page Component Loaded");
-console.log("Theme:", theme);
-console.log("Office Image:", office);
+     
     </>
   );
 };

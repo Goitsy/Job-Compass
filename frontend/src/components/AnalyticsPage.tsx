@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import {
   Box,
@@ -16,6 +16,7 @@ import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { Bar } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
+import { ThemeContext } from "../state/ThemeContext";
 
 Chart.register(...registerables);
 
@@ -35,18 +36,19 @@ type AnalyticsData = {
   >;
 };
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
-
 const AnalyticsPage = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [view, setView] = useState<"monthly" | "yearly">("monthly");
   const theme = useTheme();
+  const { mode } = useContext(ThemeContext);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
+
       .get("/api/analytics", {
         headers: { Authorization: `Bearer ${token}` },
+
       })
       .then((response) => setAnalytics(response.data))
       .catch((error) => console.error("Error fetching analytics:", error));
@@ -109,8 +111,12 @@ const AnalyticsPage = () => {
           textShadow: "2px 2px 6px rgba(0, 0, 1)",
           p: 2,
           mt: 4,
+
           mb: 6,
           textAlign: "center",
+
+          mb: 11,
+
         }}
       >
         Analytics Overview
@@ -192,8 +198,16 @@ const AnalyticsPage = () => {
             📆 Yearly
           </ToggleButton>
         </ToggleButtonGroup>
-
-        <Box sx={{ width: "100%", maxWidth: "75%", margin: "0 auto" }}>
+        <Box
+          sx={{
+            mt: 15,
+            mb: 10,
+            width: "100%",
+            maxWidth: { xs: "100%", sm: "90%", height: 600 },
+            margin: "0 auto",
+            overflowX: "auto",
+          }}
+        >
           <Bar
             data={{
               labels:
@@ -237,7 +251,17 @@ const AnalyticsPage = () => {
             }}
             options={{
               responsive: true,
-              plugins: { legend: { display: true, position: "top" } },
+
+       
+
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "top",
+                },
+              },
+
             }}
           />
         </Box>

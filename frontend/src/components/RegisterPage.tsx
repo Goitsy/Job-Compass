@@ -23,8 +23,6 @@ import {
   UserCredential,
 } from "firebase/auth";
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
-
 const RegisterPage = () => {
   const { mode } = useContext(ThemeContext);
   const [registerData, setRegisterData] = useState({
@@ -39,10 +37,27 @@ const RegisterPage = () => {
     setRegisterData({ ...registerData, [e.target.name]: e.target.value });
   };
 
+  const validatePassword = (password: string) => {
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validatePassword(registerData.password)) {
+      alert(
+        "Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character."
+      );
+      return;
+    }
+
     try {
-      const response = await axios.post("/api/auth/register", registerData);
+      const response = await axios.post(
+        "http://localhost:2000/api/auth/register",
+        registerData
+      );
       alert("Registration successful! Please sign in.");
       console.log("Register Success:", response.data);
 
@@ -58,10 +73,13 @@ const RegisterPage = () => {
     const user = await signInWithGoogle();
     if (user && user.displayName && user.email) {
       try {
-        const response = await axios.post("/api/auth/google-register", {
-          name: user.displayName,
-          email: user.email,
-        });
+        const response = await axios.post(
+          "http://localhost:2000/api/auth/google-register",
+          {
+            name: user.displayName,
+            email: user.email,
+          }
+        );
         const { token } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("userName", user.displayName);
@@ -84,10 +102,13 @@ const RegisterPage = () => {
       const user = userCredential.user;
 
       if (user && user.displayName && user.email) {
-        const response = await axios.post("/api/auth/facebook-register", {
-          name: user.displayName,
-          email: user.email,
-        });
+        const response = await axios.post(
+          "http://localhost:2000/api/auth/facebook-register",
+          {
+            name: user.displayName,
+            email: user.email,
+          }
+        );
         const { token } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("userName", user.displayName);
