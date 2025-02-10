@@ -24,3 +24,4 @@ firebaseConfig.ts
 *.njsproj
 *.sln
 *.sw?
+.env
