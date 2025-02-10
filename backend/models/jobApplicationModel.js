@@ -15,7 +15,7 @@ const jobApplicationSchema = new Schema(
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user", //WE have to reference the user model in order for the applications to be tied to the user profile
+      ref: "user",
       required: true,
     },
   },

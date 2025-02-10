@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import {
   Box,
@@ -7,7 +7,6 @@ import {
   Paper,
   ToggleButton,
   ToggleButtonGroup,
-  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -17,6 +16,7 @@ import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { Bar } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
+import { ThemeContext } from "../state/ThemeContext";
 
 Chart.register(...registerables);
 
@@ -41,6 +41,7 @@ const AnalyticsPage = () => {
   const [view, setView] = useState<"monthly" | "yearly">("monthly");
 
   const theme = useTheme();
+  const { mode } = useContext(ThemeContext);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -90,7 +91,7 @@ const AnalyticsPage = () => {
           color: theme.palette.text.primary,
           p: 2,
           mt: 4,
-          mb: 6,
+          mb: 11,
         }}
         gutterBottom
       >
@@ -121,8 +122,16 @@ const AnalyticsPage = () => {
           <ToggleButton value="monthly">Monthly</ToggleButton>
           <ToggleButton value="yearly">Yearly</ToggleButton>
         </ToggleButtonGroup>
-
-        <Box sx={{ width: "100%", maxWidth: "75%", margin: "0 auto" }}>
+        <Box
+          sx={{
+            mt: 15,
+            mb: 10,
+            width: "100%",
+            maxWidth: { xs: "100%", sm: "90%", height: 600 },
+            margin: "0 auto",
+            overflowX: "auto",
+          }}
+        >
           <Bar
             data={{
               labels:
@@ -166,6 +175,7 @@ const AnalyticsPage = () => {
             }}
             options={{
               responsive: true,
+              maintainAspectRatio: false,
               plugins: {
                 legend: {
                   display: true,
