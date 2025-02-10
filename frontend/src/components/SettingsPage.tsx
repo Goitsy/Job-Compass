@@ -28,7 +28,6 @@ interface UserSettings {
   emailNotification: boolean;
   profilePicture?: string;
 }
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -81,7 +80,7 @@ const SettingsPage: React.FC = () => {
         return;
       }
 
-      const response = await fetch("/api/settings", {
+      const response = await fetch("http://localhost:2000/api/settings", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -114,7 +113,7 @@ const SettingsPage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
-      setError(error instanceof Error ? "" : "");
+      setError(error instanceof Error ? "Unable to load settings" : "");
     } finally {
       setLoading(false);
     }
@@ -152,7 +151,7 @@ const SettingsPage: React.FC = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "/api/settings/upload-profile-picture",
+        "http://localhost:2000/api/settings/upload-profile-picture",
         formData,
         {
           headers: {
@@ -342,15 +341,16 @@ const SettingsPage: React.FC = () => {
   return (
     <Box
       sx={{
-        p: 4,
-        minWidth: "100vw",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         minHeight: "100vh",
         background:
           mode === "light"
             ? "linear-gradient(to bottom, #ffffff, #7C3AED,#ffffff)"
             : "linear-gradient(to bottom, #121212, #1f1f1f)",
-        alignItems: "center",
         position: "relative",
+        p: 4,
       }}
     >
       <Paper
@@ -361,6 +361,7 @@ const SettingsPage: React.FC = () => {
           minHeight: "80vh",
           maxHeight: "95vh",
           overflowY: "auto",
+
           p: {
             xs: 2,
             sm: 3,

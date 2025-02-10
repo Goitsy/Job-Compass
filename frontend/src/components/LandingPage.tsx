@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import office from "../assets/office.jpeg";
 import { CheckCircle, BarChart, Notifications } from "@mui/icons-material";
+import Footer from "./Footer";
 
 const LandingPage = () => {
   const theme = useTheme();
