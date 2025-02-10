@@ -54,12 +54,47 @@ const Navbar = () => {
         Job Compass
       </Typography>
 
-      <IconButton
-        sx={{ display: { xs: "block", sm: "none" } }}
-        onClick={toggleMenu}
-      >
-        <Menu sx={{ color: "white" }} />
-      </IconButton>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 2 }}>
+          {hideMenu ? (
+            <Button
+              sx={{ color: "white" }}
+              onClick={() => navigate("/auth/signin")}
+            >
+              Sign In / Register
+            </Button>
+          ) : (
+            isLoggedIn && (
+              <>
+                <Button sx={{ color: "white" }} onClick={goToHome}>
+                  Home
+                </Button>
+                <Button sx={{ color: "white" }} onClick={goToAnalytics}>
+                  Analytics
+                </Button>
+                <Button sx={{ color: "white" }} onClick={goToSettings}>
+                  Settings
+                </Button>
+                <Button sx={{ color: "white" }} onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
+            )
+          )}
+        </Box>
+        <IconButton
+          onClick={toggleMode}
+          sx={{ color: "white", fontSize: "24px" }}
+        >
+          {mode === "light" ? <FaSun /> : <FaMoon />}
+        </IconButton>
+        <IconButton
+          sx={{ display: { xs: "block", sm: "none" } }}
+          onClick={toggleMenu}
+        >
+          <Menu sx={{ color: "white" }} />
+        </IconButton>
+      </Box>
 
       <Drawer anchor="right" open={openMenu} onClose={toggleMenu}>
         <Box sx={{ width: 250, p: 2 }}>
@@ -82,54 +117,6 @@ const Navbar = () => {
           </Box>
         </Box>
       </Drawer>
-
-      <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 2 }}>
-        {hideMenu ? (
-          <Button
-            sx={{ color: "white" }}
-            onClick={() => navigate("/auth/signin")}
-          >
-            Sign In / Register
-          </Button>
-        ) : (
-          <>
-            {isLoggedIn ? (
-              <>
-                <Button sx={{ color: "white" }} onClick={goToHome}>
-                  Home
-                </Button>
-                <Button sx={{ color: "white" }} onClick={goToAnalytics}>
-                  Analytics
-                </Button>
-                <Button sx={{ color: "white" }} onClick={goToSettings}>
-                  Settings
-                </Button>
-                <Button sx={{ color: "white" }} onClick={handleLogout}>
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <Button
-                sx={{ color: "white" }}
-                onClick={() => navigate("/auth/signin")}
-              >
-                Sign In / Register
-              </Button>
-            )}
-          </>
-        )}
-      </Box>
-
-      <IconButton
-        onClick={toggleMode}
-        sx={{
-          color: "white",
-          fontSize: "24px",
-          display: { xs: "block", sm: "block" },
-        }}
-      >
-        {mode === "light" ? <FaSun /> : <FaMoon />}
-      </IconButton>
     </Box>
   );
 };
