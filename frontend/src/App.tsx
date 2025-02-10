@@ -1,4 +1,4 @@
-import { ThemeContextProvider } from "./state/ThemeContext";
+import ThemeContextProvider from "./state/ThemeContext";
 import Navbar from "./components/NavBar";
 import { Route, Routes, Navigate } from "react-router-dom";
 import LandingPage from "./components/LandingPage";

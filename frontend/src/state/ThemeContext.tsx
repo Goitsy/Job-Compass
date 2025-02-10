@@ -8,13 +8,13 @@ interface ThemeContextProps {
 }
 
 // Create the ThemeContext
-export const ThemeContext = createContext<ThemeContextProps>({
+const ThemeContext = createContext<ThemeContextProps>({
   mode: "light",
   toggleMode: () => {},
 });
 
 // ThemeContextProvider to wrap the app
-export const ThemeContextProvider: React.FC<{ children: React.ReactNode }> = ({
+const ThemeContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [mode, setMode] = useState<"light" | "dark">("light");
@@ -45,3 +45,5 @@ export const ThemeContextProvider: React.FC<{ children: React.ReactNode }> = ({
     </ThemeContext.Provider>
   );
 };
+export { ThemeContext };
+export default ThemeContextProvider;

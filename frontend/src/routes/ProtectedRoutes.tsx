@@ -2,7 +2,7 @@ import { useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
-  children: ReactNode; //The children can be any React (component, text svg (valid react))
+  children: ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
