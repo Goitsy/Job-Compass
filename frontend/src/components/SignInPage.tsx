@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -15,102 +15,80 @@ import {
 import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import { ThemeContext } from "../state/ThemeContext";
-import { signInWithGoogle } from "../firebaseConfig";
-import {
-  getAuth,
-  FacebookAuthProvider,
-  signInWithPopup,
-  UserCredential,
-} from "firebase/auth";
+import { signInWithGoogle, signInWithFacebook } from "../firebaseConfig";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
-
-const RegisterPage = () => {
+const SignInPage = () => {
   const { mode } = useContext(ThemeContext);
-  const [registerData, setRegisterData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+  const [signInData, setSignInData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRegisterData({ ...registerData, [e.target.name]: e.target.value });
+  const handleSignInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSignInData({ ...signInData, [e.target.name]: e.target.value });
   };
 
-  const validatePassword = (password: string) => {
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return passwordRegex.test(password);
-  };
-
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
+  const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validatePassword(registerData.password)) {
-      alert(
-        "Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character."
-      );
-      return;
-    }
-
     try {
-      const response = await axios.post("/api/auth/register", registerData);
-      alert("Registration successful! Please sign in.");
-      console.log("Register Success:", response.data);
+      const response = await axios.post("/api/auth/login", signInData);
+      console.log("Login response:", response.data);
+      const { token, user } = response.data;
+      const { name } = user;
 
-      setRegisterData({ name: "", email: "", password: "" });
-      navigate("/auth/signin");
+      localStorage.setItem("token", token);
+      localStorage.setItem("userName", name);
+
+      console.log("Sign In Success:", response.data);
+
+      setSignInData({ email: "", password: "" });
+      navigate("/home");
     } catch (error) {
-      console.error("Register Error:", error);
-      alert("Registration failed. Please try again.");
+      console.error("Sign In Error:", error);
+      alert("Sign-in failed. Check your credentials and try again.");
     }
   };
 
-  const handleGoogleRegister = async () => {
+  const handleGoogleLogin = async () => {
     const user = await signInWithGoogle();
     if (user && user.displayName && user.email) {
       try {
-        const response = await axios.post("/api/auth/google-register", {
+        const response = await axios.post("/api/auth/google-login", {
           name: user.displayName,
           email: user.email,
         });
         const { token } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("userName", user.displayName);
-
-        navigate("/auth/signin");
+        navigate("/home");
       } catch (error) {
-        console.error("Google Register Backend Error:", error);
+        console.error("Google Sign-In Backend Error:", error);
       }
     } else {
       console.error("Google login failed: Missing user details.");
     }
   };
-  const handleFacebookRegister = async () => {
-    try {
-      const userCredential: UserCredential = await signInWithPopup(
-        getAuth(),
-        new FacebookAuthProvider()
-      );
-      const user = userCredential.user;
 
-      if (user && user.displayName && user.email) {
-        const response = await axios.post("/api/auth/facebook-register", {
+  const handleFacebookLogin = async () => {
+    const user = await signInWithFacebook();
+    if (user && user.displayName && user.email) {
+      try {
+        const response = await axios.post("/api/auth/facebook-login", {
           name: user.displayName,
           email: user.email,
         });
         const { token } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("userName", user.displayName);
-
-        navigate("/auth/signin");
+        navigate("/home");
+      } catch (error) {
+        console.error("Facebook Sign-In Backend Error:", error);
       }
-    } catch (error) {
-      console.error("Facebook Register Error:", error);
+    } else {
+      console.error("Facebook login failed: Missing user details.");
     }
   };
+
   return (
     <Box
       sx={{
@@ -137,23 +115,15 @@ const RegisterPage = () => {
         }}
       >
         <Typography variant="h5" gutterBottom>
-          Register
+          Sign In
         </Typography>
-        <form onSubmit={handleRegisterSubmit}>
-          <TextField
-            fullWidth
-            label="Name"
-            name="name"
-            value={registerData.name}
-            onChange={handleRegisterChange}
-            margin="normal"
-          />
+        <form onSubmit={handleSignInSubmit}>
           <TextField
             fullWidth
             label="Email"
             name="email"
-            value={registerData.email}
-            onChange={handleRegisterChange}
+            value={signInData.email}
+            onChange={handleSignInChange}
             margin="normal"
           />
           <TextField
@@ -161,8 +131,8 @@ const RegisterPage = () => {
             label="Password"
             name="password"
             type={showPassword ? "text" : "password"}
-            value={registerData.password}
-            onChange={handleRegisterChange}
+            value={signInData.password}
+            onChange={handleSignInChange}
             margin="normal"
           />
           <FormControlLabel
@@ -182,7 +152,7 @@ const RegisterPage = () => {
             color="primary"
             sx={{ mt: 2 }}
           >
-            Register
+            Sign In
           </Button>
 
           <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -191,7 +161,7 @@ const RegisterPage = () => {
                 <IconButton
                   color="error"
                   sx={{ width: "100%" }}
-                  onClick={handleGoogleRegister}
+                  onClick={handleGoogleLogin}
                 >
                   <GoogleIcon />
                 </IconButton>
@@ -202,7 +172,7 @@ const RegisterPage = () => {
                 <IconButton
                   color="primary"
                   sx={{ width: "100%" }}
-                  onClick={handleFacebookRegister}
+                  onClick={handleFacebookLogin}
                 >
                   <FacebookIcon />
                 </IconButton>
@@ -211,12 +181,12 @@ const RegisterPage = () => {
           </Grid>
         </form>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          Already have an account?{" "}
-          <Button onClick={() => navigate("/auth/signin")}>Sign In</Button>
+          Not yet registered?{" "}
+          <Button onClick={() => navigate("/auth/register")}>Register</Button>
         </Typography>
       </Paper>
     </Box>
   );
 };
 
-export default RegisterPage;
+export default SignInPage;

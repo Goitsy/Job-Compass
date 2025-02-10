@@ -1,78 +1,201 @@
-import React from "react";
-import { Box, Typography, Stack, Link } from "@mui/material";
+import { Box, Typography, Link } from "@mui/material";
 import { Facebook, Twitter, Instagram } from "@mui/icons-material";
 
 const Footer = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "black", // Black background
-        color: "white", // White text for contrast
-        padding: "40px 20px", // Padding for spacing
-        textAlign: "center", // Centered text
-        width: "100%", // Ensure it takes up the full width
-        position: "relative", // To avoid it being cut off
+        backgroundColor: "black",
+        color: "white",
+        padding: "40px 20px",
+        textAlign: "center",
+        width: "100%",
+        position: "relative",
       }}
     >
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        spacing={4}
-        justifyContent="space-between"
+      <Box
         sx={{
-          maxWidth: "1200px", // Maximum width for larger screens
-          margin: "0 auto", // Centers the content within the footer
-          mb: 4,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          flexWrap: "wrap",
+          gap: 4,
+          maxWidth: "1200px",
+          margin: "0 auto",
         }}
       >
-        {/* Job Compass Section */}
-        <Box sx={{ maxWidth: 300 }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 10px",
+            width: { xs: "100%", sm: "25%" },
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
             Job Compass
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ lineHeight: 1.6 }}>
             Your career navigation tool to help you find, track, and manage job
             applications.
           </Typography>
         </Box>
 
-        {/* Features Section */}
-        <Box sx={{ maxWidth: 300 }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 10px",
+            width: { xs: "100%", sm: "25%" },
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
             Features
           </Typography>
-          <Typography variant="body2">Application Tracking</Typography>
-          <Typography variant="body2">Job Search</Typography>
-          <Typography variant="body2">Analytics</Typography>
+          <Link
+            href="/info#features"
+            color="inherit"
+            sx={{
+              "&:hover": { color: "#7C3AED" },
+              textDecoration: "none",
+            }}
+          >
+            <Typography variant="body2" sx={{ marginBottom: 1 }}>
+              Application Tracking
+            </Typography>
+          </Link>
+          <Link
+            href="/info#features"
+            color="inherit"
+            sx={{
+              "&:hover": { color: "#7C3AED" },
+              textDecoration: "none",
+            }}
+          >
+            <Typography variant="body2" sx={{ marginBottom: 1 }}>
+              Job Search
+            </Typography>
+          </Link>
+          <Link
+            href="/info#features"
+            color="inherit"
+            sx={{
+              "&:hover": { color: "#7C3AED" },
+              textDecoration: "none",
+            }}
+          >
+            <Typography variant="body2" sx={{ marginBottom: 1 }}>
+              Analytics
+            </Typography>
+          </Link>
         </Box>
 
-        {/* Company Section */}
-        <Box sx={{ maxWidth: 300 }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 10px",
+            width: { xs: "100%", sm: "25%" },
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
             Company
           </Typography>
-          <Typography variant="body2">About Us</Typography>
-          <Typography variant="body2">Careers</Typography>
-          <Typography variant="body2">Privacy Policy</Typography>
+          <Link
+            href="/info#company"
+            color="inherit"
+            sx={{
+              "&:hover": { color: "#7C3AED" },
+              textDecoration: "none",
+            }}
+          >
+            <Typography variant="body2" sx={{ marginBottom: 1 }}>
+              About Us
+            </Typography>
+          </Link>
+          <Link
+            href="/info#company"
+            color="inherit"
+            sx={{
+              "&:hover": { color: "#7C3AED" },
+              textDecoration: "none",
+            }}
+          >
+            <Typography variant="body2" sx={{ marginBottom: 1 }}>
+              Careers
+            </Typography>
+          </Link>
+          <Link
+            href="/info#company"
+            color="inherit"
+            sx={{
+              "&:hover": { color: "#7C3AED" },
+              textDecoration: "none",
+            }}
+          >
+            <Typography variant="body2" sx={{ marginBottom: 1 }}>
+              Privacy Policy
+            </Typography>
+          </Link>
         </Box>
 
-        {/* Connect Section */}
-        <Box sx={{ maxWidth: 300 }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 10px",
+            width: { xs: "100%", sm: "25%" },
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
             Connect
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-            <Link href="https://www.facebook.com" color="inherit">
+            <Link
+              href="https://www.facebook.com"
+              color="inherit"
+              sx={{
+                "&:hover": { color: "#7C3AED" },
+                textDecoration: "none",
+              }}
+            >
               <Facebook />
             </Link>
-            <Link href="https://twitter.com" color="inherit">
+            <Link
+              href="https://twitter.com"
+              color="inherit"
+              sx={{
+                "&:hover": { color: "#7C3AED" },
+                textDecoration: "none",
+              }}
+            >
               <Twitter />
             </Link>
-            <Link href="https://www.instagram.com" color="inherit">
+            <Link
+              href="https://www.instagram.com"
+              color="inherit"
+              sx={{
+                "&:hover": { color: "#7C3AED" },
+                textDecoration: "none",
+              }}
+            >
               <Instagram />
             </Link>
           </Box>
         </Box>
-      </Stack>
+      </Box>
 
       <Box sx={{ mt: 4 }}>
         <Typography variant="body2">
