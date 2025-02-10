@@ -79,7 +79,6 @@ const glowAnimation = keyframes`
   }
 `;
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 const HomePage = () => {
   const { mode } = useContext(ThemeContext);
   const [applications, setApplications] = useState<JobApplication[]>([]);
@@ -111,7 +110,7 @@ const HomePage = () => {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("/api/settings", {
+        const response = await axios.get("http://localhost:2000/api/settings", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -138,7 +137,7 @@ const HomePage = () => {
 
   const fetchApplications = async () => {
     try {
-      const response = await axios.get("/api/jobapp", {
+      const response = await axios.get("http://localhost:2000/api/jobapp", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setApplications(response.data);
@@ -216,14 +215,16 @@ const HomePage = () => {
     e.preventDefault();
     try {
       if (editId) {
+
         await axios.put(`/api/jobapp/${editId}`, formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
+
         setEditId(null);
       } else {
-        await axios.post("/api/jobapp", formData, {
+        await axios.post("http://localhost:2000/api/jobapp", formData, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
       }
@@ -236,13 +237,8 @@ const HomePage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this application?"
-    );
-    if (!confirmDelete) return;
-
     try {
-      await axios.delete(`/api/jobapp/${id}`, {
+      await axios.delete(`http://localhost:2000/api/jobapp/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       fetchApplications();
@@ -264,8 +260,10 @@ const HomePage = () => {
   const handleStatusUpdate = async (status: string) => {
     try {
       if (currentAppId) {
+
         await axios.put(
           `/api/jobapp/update-status`,
+
           { id: currentAppId, status },
           {
             headers: {

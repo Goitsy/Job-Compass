@@ -78,7 +78,9 @@ const SettingsPage: React.FC = () => {
         return;
       }
 
+
       const response = await fetch("/api/settings", {
+
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -149,7 +151,9 @@ const SettingsPage: React.FC = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
+
         "/api/settings/upload-profile-picture",
+
         formData,
         {
           headers: {
@@ -351,6 +355,7 @@ const SettingsPage: React.FC = () => {
           maxHeight: "95vh",
           overflowY: "auto",
           mt: "50",
+
           p: {
             xs: 2,
             sm: 3,

@@ -36,8 +36,6 @@ type AnalyticsData = {
   >;
 };
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
-
 const AnalyticsPage = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [view, setView] = useState<"monthly" | "yearly">("monthly");
@@ -49,7 +47,7 @@ const AnalyticsPage = () => {
     const token = localStorage.getItem("token");
 
     axios
-      .get("/api/analytics", {
+      .get("http://localhost:2000/api/analytics", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
