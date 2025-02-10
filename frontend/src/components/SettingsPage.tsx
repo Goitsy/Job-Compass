@@ -29,6 +29,8 @@ interface UserSettings {
   profilePicture?: string;
 }
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { mode, toggleMode } = useContext(ThemeContext);
@@ -80,7 +82,7 @@ const SettingsPage: React.FC = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:2000/api/settings", {
+      const response = await fetch("/api/settings", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -151,7 +153,7 @@ const SettingsPage: React.FC = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:2000/api/settings/upload-profile-picture",
+        "/api/settings/upload-profile-picture",
         formData,
         {
           headers: {
@@ -287,16 +289,12 @@ const SettingsPage: React.FC = () => {
       }
 
       // Send update request
-      const response = await axios.patch(
-        "http://localhost:2000/api/settings/update",
-        updatePayload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axios.patch("api/settings/update", updatePayload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       // Update local state with response
       setSettings((prev) => ({
