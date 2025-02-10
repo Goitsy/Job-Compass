@@ -92,6 +92,7 @@ const RegisterPage = () => {
       console.error("Google login failed: Missing user details.");
     }
   };
+
   const handleFacebookRegister = async () => {
     try {
       const userCredential: UserCredential = await signInWithPopup(
@@ -118,6 +119,7 @@ const RegisterPage = () => {
       console.error("Facebook Register Error:", error);
     }
   };
+
   return (
     <Box
       sx={{
@@ -130,8 +132,6 @@ const RegisterPage = () => {
           mode === "light"
             ? "linear-gradient(to bottom, #4c4f8c, #b87dd8)"
             : "linear-gradient(to bottom, #121212, #1f1f1f)",
-        backgroundSize: "400% 400%",
-        animation: "shinyEffect 3s ease infinite",
       }}
     >
       <Paper
@@ -141,9 +141,16 @@ const RegisterPage = () => {
           width: "100%",
           maxWidth: "400px",
           textAlign: "center",
+          borderRadius: "12px",
+          backgroundColor: mode === "light" ? "#fff" : "#222",
+          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
         }}
       >
-        <Typography variant="h5" gutterBottom>
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{ color: mode === "light" ? "#4c4f8c" : "#ffffff" }}
+        >
           Register
         </Typography>
         <form onSubmit={handleRegisterSubmit}>
@@ -172,6 +179,7 @@ const RegisterPage = () => {
             onChange={handleRegisterChange}
             margin="normal"
           />
+
           <FormControlLabel
             control={
               <Checkbox
@@ -182,45 +190,71 @@ const RegisterPage = () => {
             }
             label="Show Password"
           />
+
+          {/* WOW Register Button */}
           <Button
             fullWidth
             type="submit"
             variant="contained"
-            color="primary"
-            sx={{ mt: 2 }}
+            sx={{
+              mt: 2,
+              background: "linear-gradient(135deg, #9B51E0, #7C3AED)",
+              color: "#fff",
+              fontWeight: "bold",
+              fontSize: "1rem",
+              borderRadius: "8px",
+              "&:hover": { transform: "scale(1.05)" },
+              "&:active": { transform: "scale(0.95)" },
+            }}
           >
-            Register
+            REGISTER
           </Button>
 
+          {/* Google & Facebook Buttons */}
           <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={12}>
-              <Box sx={{ width: "100%" }}>
-                <IconButton
-                  color="error"
-                  sx={{ width: "100%" }}
-                  onClick={handleGoogleRegister}
-                >
-                  <GoogleIcon />
-                </IconButton>
-              </Box>
+            <Grid item xs={6}>
+              <IconButton
+                onClick={handleGoogleRegister}
+                sx={{
+                  width: "100%",
+                  borderRadius: "8px",
+                  "&:hover": { transform: "scale(1.05)" },
+                  "&:active": { transform: "scale(0.95)" },
+                }}
+              >
+                <GoogleIcon sx={{ color: "#ff0000" }} />
+              </IconButton>
             </Grid>
-            <Grid item xs={12}>
-              <Box sx={{ width: "100%" }}>
-                <IconButton
-                  color="primary"
-                  sx={{ width: "100%" }}
-                  onClick={handleFacebookRegister}
-                >
-                  <FacebookIcon />
-                </IconButton>
-              </Box>
+            <Grid item xs={6}>
+              <IconButton
+                onClick={handleFacebookRegister}
+                sx={{
+                  width: "100%",
+                  borderRadius: "8px",
+                  "&:hover": { transform: "scale(1.05)" },
+                  "&:active": { transform: "scale(0.95)" },
+                }}
+              >
+                <FacebookIcon sx={{ color: "#1877F2" }} />
+              </IconButton>
             </Grid>
           </Grid>
+
+          <Typography sx={{ mt: 2 }}>
+            Already have an account?{" "}
+            <Button
+              onClick={() => navigate("/auth/signin")}
+              sx={{
+                color: "#7C3AED",
+                fontWeight: "bold",
+                "&:hover": { transform: "scale(1.05)" },
+                "&:active": { transform: "scale(0.95)" },
+              }}
+            >
+              SIGN IN
+            </Button>
+          </Typography>
         </form>
-        <Typography variant="body1" sx={{ mt: 2 }}>
-          Already have an account?{" "}
-          <Button onClick={() => navigate("/auth/signin")}>Sign In</Button>
-        </Typography>
       </Paper>
     </Box>
   );

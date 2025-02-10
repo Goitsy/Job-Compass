@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -15,7 +15,15 @@ import {
 import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import { ThemeContext } from "../state/ThemeContext";
-import { signInWithGoogle, signInWithFacebook } from "../firebaseConfig";
+import { signInWithGoogle } from "../firebaseConfig";
+import {
+  getAuth,
+  FacebookAuthProvider,
+  signInWithPopup,
+  UserCredential,
+} from "firebase/auth";
+
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 const SignInPage = () => {
@@ -32,25 +40,27 @@ const SignInPage = () => {
     e.preventDefault();
     try {
 
-
       const response = await axios.post("/api/auth/login", signInData);
 
-      console.log("Login response:", response.data);
+
+
       const { token, user } = response.data;
-      const { name } = user;
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("userName", name);
+      if (token) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("userName", user?.name || "User");
 
-      console.log("Sign In Success:", response.data);
-
-      setSignInData({ email: "", password: "" });
-      navigate("/home");
+        console.log("Sign In Success:", response.data);
+        navigate("/home"); // 🔥 Уверих се, че навигацията е правилна
+      } else {
+        throw new Error("Invalid response from server");
+      }
     } catch (error) {
       console.error("Sign In Error:", error);
-      alert("Sign-in failed. Check your credentials and try again.");
+      alert("Sign-in failed. Please check your email and password.");
     }
   };
+
 
   const handleGoogleLogin = async () => {
     const user = await signInWithGoogle();
@@ -64,16 +74,18 @@ const SignInPage = () => {
 
         const { token } = response.data;
         localStorage.setItem("token", token);
-        localStorage.setItem("userName", user.displayName);
+        localStorage.setItem("userName", user.displayName || "User");
+
         navigate("/home");
-      } catch (error) {
-        console.error("Google Sign-In Backend Error:", error);
+      } else {
+        throw new Error("Google login failed: Missing user details.");
       }
-    } else {
-      console.error("Google login failed: Missing user details.");
+    } catch (error) {
+      console.error("Google Sign In Error:", error);
     }
   };
 
++
   const handleFacebookLogin = async () => {
     const user = await signInWithFacebook();
     if (user && user.displayName && user.email) {
@@ -84,15 +96,15 @@ const SignInPage = () => {
           email: user.email,
         });
 
+
         const { token } = response.data;
         localStorage.setItem("token", token);
-        localStorage.setItem("userName", user.displayName);
+        localStorage.setItem("userName", user.displayName || "User");
+
         navigate("/home");
-      } catch (error) {
-        console.error("Facebook Sign-In Backend Error:", error);
       }
-    } else {
-      console.error("Facebook login failed: Missing user details.");
+    } catch (error) {
+      console.error("Facebook Sign In Error:", error);
     }
   };
 
@@ -108,8 +120,6 @@ const SignInPage = () => {
           mode === "light"
             ? "linear-gradient(to bottom, #4c4f8c, #b87dd8)"
             : "linear-gradient(to bottom, #121212, #1f1f1f)",
-        backgroundSize: "400% 400%",
-        animation: "shinyEffect 3s ease infinite",
       }}
     >
       <Paper
@@ -119,9 +129,16 @@ const SignInPage = () => {
           width: "100%",
           maxWidth: "400px",
           textAlign: "center",
+          borderRadius: "12px",
+          backgroundColor: mode === "light" ? "#fff" : "#222",
+          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
         }}
       >
-        <Typography variant="h5" gutterBottom>
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{ color: mode === "light" ? "#4c4f8c" : "#ffffff" }}
+        >
           Sign In
         </Typography>
         <form onSubmit={handleSignInSubmit}>
@@ -142,6 +159,7 @@ const SignInPage = () => {
             onChange={handleSignInChange}
             margin="normal"
           />
+
           <FormControlLabel
             control={
               <Checkbox
@@ -152,45 +170,71 @@ const SignInPage = () => {
             }
             label="Show Password"
           />
+
+          {/* WOW Sign In Button */}
           <Button
             fullWidth
             type="submit"
             variant="contained"
-            color="primary"
-            sx={{ mt: 2 }}
+            sx={{
+              mt: 2,
+              background: "linear-gradient(135deg, #9B51E0, #7C3AED)",
+              color: "#fff",
+              fontWeight: "bold",
+              fontSize: "1rem",
+              borderRadius: "8px",
+              "&:hover": { transform: "scale(1.05)" },
+              "&:active": { transform: "scale(0.95)" },
+            }}
           >
-            Sign In
+            SIGN IN
           </Button>
 
+          {/* Google & Facebook Buttons */}
           <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={12}>
-              <Box sx={{ width: "100%" }}>
-                <IconButton
-                  color="error"
-                  sx={{ width: "100%" }}
-                  onClick={handleGoogleLogin}
-                >
-                  <GoogleIcon />
-                </IconButton>
-              </Box>
+            <Grid item xs={6}>
+              <IconButton
+                onClick={handleGoogleSignIn}
+                sx={{
+                  width: "100%",
+                  borderRadius: "8px",
+                  "&:hover": { transform: "scale(1.05)" },
+                  "&:active": { transform: "scale(0.95)" },
+                }}
+              >
+                <GoogleIcon sx={{ color: "#ff0000" }} />
+              </IconButton>
             </Grid>
-            <Grid item xs={12}>
-              <Box sx={{ width: "100%" }}>
-                <IconButton
-                  color="primary"
-                  sx={{ width: "100%" }}
-                  onClick={handleFacebookLogin}
-                >
-                  <FacebookIcon />
-                </IconButton>
-              </Box>
+            <Grid item xs={6}>
+              <IconButton
+                onClick={handleFacebookSignIn}
+                sx={{
+                  width: "100%",
+                  borderRadius: "8px",
+                  "&:hover": { transform: "scale(1.05)" },
+                  "&:active": { transform: "scale(0.95)" },
+                }}
+              >
+                <FacebookIcon sx={{ color: "#1877F2" }} />
+              </IconButton>
             </Grid>
           </Grid>
+
+          <Typography sx={{ mt: 2 }}>
+            Don't have an account?{" "}
+            <Button
+              onClick={() => navigate("/auth/register")}
+              sx={{
+                color: "#7C3AED",
+                fontWeight: "bold",
+                "&:hover": { transform: "scale(1.05)" },
+                "&:active": { transform: "scale(0.95)" },
+              }}
+            >
+              REGISTER
+            </Button>
+          </Typography>
         </form>
-        <Typography variant="body1" sx={{ mt: 2 }}>
-          Not yet registered?{" "}
-          <Button onClick={() => navigate("/auth/register")}>Register</Button>
-        </Typography>
       </Paper>
     </Box>
   );

@@ -47,7 +47,8 @@ const InfoPage = () => {
       <Typography
         variant="h2"
         sx={{
-          color: mode === "light" ? "#121212" : "#ffffff",
+          color: mode === "light" ? "#7C3AED" : "#ffffff",
+          textShadow: "2px 2px 6px rgba(0, 0, 0, 0.2)",
           textAlign: "center",
           mb: 4,
           mt: 8,
