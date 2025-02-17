@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Box,
@@ -16,7 +16,6 @@ import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { Bar } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
-import { ThemeContext } from "../state/ThemeContext";
 
 Chart.register(...registerables);
 
@@ -43,7 +42,6 @@ const AnalyticsPage = () => {
   const [view, setView] = useState<"monthly" | "yearly">("monthly");
 
   const theme = useTheme();
-  const { mode } = useContext(ThemeContext);
 
   useEffect(() => {
     const token = localStorage.getItem("token");

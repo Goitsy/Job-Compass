@@ -11,7 +11,6 @@ import {
   FormControlLabel,
   Alert,
   Avatar,
-  IconButton,
 } from "@mui/material";
 import { PhotoCamera } from "@mui/icons-material";
 import { ThemeContext } from "../state/ThemeContext";
@@ -326,7 +325,21 @@ const SettingsPage: React.FC = () => {
       setLoading(false);
     }
   };
-
+  if (loading)
+    if (loading) {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+          }}
+        >
+          <Typography variant="h5">Loading settings...</Typography>
+        </Box>
+      );
+    }
   return (
     <Box
       sx={{
